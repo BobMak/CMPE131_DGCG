@@ -1,3 +1,3 @@
-# CMPE131_rouglike
+# CMPE131_roguelike
 
 A simple roguelike with randomly generated levels
