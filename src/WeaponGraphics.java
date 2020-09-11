@@ -13,7 +13,7 @@ public class WeaponGraphics {
 
 	//For now only use 1 gun
 	private Image loadImage() {
-		ImageIcon ii = new ImageIcon("res/pistol.jpg");
+		ImageIcon ii = new ImageIcon("res/pistol.png");
 		Image gun1 = ii.getImage();
 		Image modGun1 = gun1.getScaledInstance(5, 5, java.awt.Image.SCALE_DEFAULT);
 		return modGun1;
