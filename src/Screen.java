@@ -32,7 +32,9 @@ public class Screen extends JPanel implements ActionListener {
     initTest();
   }
 
-  public void initTest() { map = new int[50][75]; }
+  public void initTest() {
+    map = new int[50][75];
+  }
 
   private void loadTiles() {
     try {
@@ -52,11 +54,10 @@ public class Screen extends JPanel implements ActionListener {
   }
 
   private void doDrawing(Graphics g) {
-    System.out.println("drawn");
     Graphics2D g2d = (Graphics2D) g;
 
-    for (int y=0; y<50 ; y++) {
-      for (int x=0; x<75 ; x++) {
+    for (int y=0; y< map.length ; y++) {
+      for (int x=0; x<map[0].length ; x++) {
         g2d.drawImage( tiles.get(map[y][x]),
                     x * TILE,
                     y * TILE, this);
