@@ -3,10 +3,13 @@
 import java.awt.event.WindowEvent;
 
 public class Game {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     GameFrame g = new GameFrame();
     while (!g.screen.quit) {
-      System.out.println('1');
+      g.screen.test();
+      g.screen.repaint();
+      Thread.sleep(1000);
+
     }
     g.dispatchEvent(new WindowEvent(g, WindowEvent.WINDOW_CLOSING));
     g.setVisible(false);
