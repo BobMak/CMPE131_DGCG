@@ -8,7 +8,7 @@ public class Game {
     while (!g.screen.quit) {
       g.screen.test();
       g.screen.repaint();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
 
     }
     g.dispatchEvent(new WindowEvent(g, WindowEvent.WINDOW_CLOSING));
