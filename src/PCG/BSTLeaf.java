@@ -1,6 +1,8 @@
 package PCG;
 
 
+import java.util.Arrays;
+
 public class BSTLeaf {
   // leaf bounds
   private int posx, posy;
@@ -36,10 +38,6 @@ public class BSTLeaf {
       childLeft  = new BSTLeaf(minsize, !splitDir, new_x1, new_y1, new_w1, new_h1);
       childRight = new BSTLeaf(minsize, !splitDir, new_x2, new_y2, new_w2, new_h2);
     }
-  }
-
-  public int[] getRoom() {
-    return new int[]{min_x, min_y, max_x, max_y};
   }
 
   public int[] getBounds() {
@@ -99,6 +97,52 @@ public class BSTLeaf {
       return;
     }
     System.out.println("Failed to build a corridor");
+  }
+
+  // check if the stub pattern matches with the pattern around the (x, y) on the map
+  private boolean isStub( int[][] map, int x, int y ) {
+    int[][][] stubPatterns =
+      { { { -1, -1, -1 },
+          { -1,  1, -1 },
+          {  1,  1,  1 }, },
+        { { -1, -1, -1 },
+          { -1,  1, -1 },
+          { -1,  1,  1 }, },
+        { { -1, -1, -1 },
+          { -1,  1, -1 },
+          {  1,  1, -1 }, } };
+    int sum;
+    for ( int[][] pattern : stubPatterns ) {
+      // there are 4 possible directions of the pattern, so rotate and check 4 times
+      for ( int _=0; _<4; _++ ) {
+        sum = 0;
+        for ( int suby=-1; suby<2; suby++) {
+          for ( int subx=-1; subx<2; subx++ ) {
+            sum += map[y + suby][x + subx] * pattern[suby + 1][subx + 1];
+          }
+        }
+        if ( sum==4 ) return true;
+        Util.rotateMatrix(3, pattern);
+      }
+    }
+    return false;
+  }
+
+  private boolean isTail( int[][] map, int x, int y ) {
+    return map[y][x] == 1 &&
+            ( map[y-1][x-1] + map[y-1][x] + map[y-1][x+1]
+            + map[y][x-1]   + map[y][x+1]
+            + map[y+1][x-1] + map[y+1][x] + map[y+1][x+1]) < 2;
+  }
+
+  public void removeDeadEnds( int[][] map ) {
+    for ( int y=1; y< map.length-1; y++ ) {
+      for ( int x=1; x<map[0].length-1; x++ ) {
+        if ( isTail(map, x, y) || isStub(map, x, y) ) {
+          map[y][x] = 0;
+        }
+      }
+    }
   }
 }
 
