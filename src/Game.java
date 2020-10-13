@@ -6,10 +6,9 @@ public class Game {
   public static void main(String[] args) throws InterruptedException {
     GameFrame g = new GameFrame();
     while (!g.screen.quit) {
-      g.screen.test();
-      g.screen.repaint();
+//      g.screen.test();
+//      g.screen.repaint();
       Thread.sleep(3000);
-
     }
     g.dispatchEvent(new WindowEvent(g, WindowEvent.WINDOW_CLOSING));
     g.setVisible(false);
