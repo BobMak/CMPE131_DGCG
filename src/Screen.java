@@ -4,16 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
 import javax.swing.*;
-import javax.imageio.ImageIO;
-import java.io.File;
 
 public class Screen extends JPanel implements ActionListener {
 
-  private Map map;
+  private MapGenerator mapGenerator;
   public boolean quit;
 
   private final int[][] tiles = {
@@ -26,10 +21,15 @@ public class Screen extends JPanel implements ActionListener {
     addKeyListener(new TAdapter());
     setBackground(Color.BLACK);
     setFocusable(true);
+    mapGenerator = new MapGenerator();
   }
 
-  public void test() {
-    map = new Map();
+  public void generate() {
+    mapGenerator.generate();
+  }
+
+  public MapGenerator getMapGenerator() {
+    return mapGenerator;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class Screen extends JPanel implements ActionListener {
 
   private void doDrawing(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
-    int [][] thismap = map.getMap();
+    int [][] thismap = mapGenerator.getMap();
     int []   clr;
     for (int y=0; y< thismap.length ; y++) {
       for (int x=0; x<thismap[0].length ; x++) {

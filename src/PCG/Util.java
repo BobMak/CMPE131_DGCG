@@ -25,4 +25,8 @@ public class Util {
       }
     }
   }
+
+  public static void sop(Object msg){
+    System.out.println(msg);
+  }
 }
