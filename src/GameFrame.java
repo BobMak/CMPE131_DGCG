@@ -14,7 +14,7 @@ public class GameFrame extends Frame {
 
     Panel controller = new Panel();
     Choice algorithms = new Choice();
-    algorithms.addItem("BST");
+    algorithms.addItem("BSP");
 
     TextField mapWidth = new TextField();
     mapWidth.setText("75");
@@ -54,16 +54,16 @@ public class GameFrame extends Frame {
     Button btnExport = new Button("Export");
     btnExport.setSize(200, 60);
 
-    controller.add(algorithms,  FlowLayout.LEFT);
-    controller.add(mapWidth,    FlowLayout.LEFT);
+    controller.add(algorithms,    FlowLayout.LEFT);
+    controller.add(mapWidth,      FlowLayout.LEFT);
     controller.add(lableWidth,    FlowLayout.LEFT);
-    controller.add(mapHeight,   FlowLayout.LEFT);
-    controller.add(lableHeight,    FlowLayout.LEFT);
-    controller.add(roomSize,    FlowLayout.LEFT);
-    controller.add(lableRoomSize,    FlowLayout.LEFT);
-    controller.add(btnGenerate, FlowLayout.LEFT);
-    controller.add(btnExport,   FlowLayout.CENTER);
-    controller.add(errMsg,      FlowLayout.LEFT);
+    controller.add(mapHeight,     FlowLayout.LEFT);
+    controller.add(lableHeight,   FlowLayout.LEFT);
+    controller.add(roomSize,      FlowLayout.LEFT);
+    controller.add(lableRoomSize, FlowLayout.LEFT);
+    controller.add(btnGenerate,   FlowLayout.LEFT);
+    controller.add(btnExport,     FlowLayout.CENTER);
+    controller.add(errMsg,        FlowLayout.LEFT);
     fm.add(controller, BorderLayout.SOUTH);
 
     fm.setVisible(true);     //set frame visibilty true

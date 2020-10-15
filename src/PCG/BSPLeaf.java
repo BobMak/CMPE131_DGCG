@@ -1,19 +1,17 @@
 package PCG;
 
 
-import java.util.Arrays;
-
-public class BSTLeaf {
+public class BSPLeaf {
   // leaf bounds
   private int posx, posy;
   private int wid,  hgt;
   // room bounds
   private int min_x, min_y;
   private int max_x, max_y;
-  private BSTLeaf childLeft;
-  private BSTLeaf childRight;
+  private BSPLeaf childLeft;
+  private BSPLeaf childRight;
 
-  public BSTLeaf(int minsize, boolean splitDir, int x, int y, int w, int h) throws Exception {
+  public BSPLeaf(int minsize, boolean splitDir, int x, int y, int w, int h) throws Exception {
     // splitDir is a boolean direction of the split - true if horizontal, false if vertical
     posx = x;
     posy = y;
@@ -35,8 +33,8 @@ public class BSTLeaf {
       int new_h2 = (splitDir) ? h : h - splitLine;
       if (splitDir) assert new_w1 + new_w2 == w : "splitline is bad";
       else          assert new_h1 + new_h2 == h : "splitline is bad";
-      childLeft  = new BSTLeaf(minsize, !splitDir, new_x1, new_y1, new_w1, new_h1);
-      childRight = new BSTLeaf(minsize, !splitDir, new_x2, new_y2, new_w2, new_h2);
+      childLeft  = new BSPLeaf(minsize, !splitDir, new_x1, new_y1, new_w1, new_h1);
+      childRight = new BSPLeaf(minsize, !splitDir, new_x2, new_y2, new_w2, new_h2);
     }
   }
 
@@ -71,7 +69,7 @@ public class BSTLeaf {
     }
   }
 
-  private void connectRooms( int[][] map, BSTLeaf room1, BSTLeaf room2 ) {
+  private void connectRooms(int[][] map, BSPLeaf room1, BSPLeaf room2 ) {
     int[] b1= room1.getBounds();
     int[] b2= room2.getBounds();
     // do a horizontal corridor if rooms are horizontally aligned

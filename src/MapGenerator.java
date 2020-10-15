@@ -1,4 +1,4 @@
-import PCG.BST;
+import PCG.BSP;
 import PCG.Generator;
 import PCG.Util;
 
@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class MapGenerator {
   private int[][] map;
   private HashMap<String, Generator> algos = new HashMap<String, Generator>(){{
-    put("BST", new BST());
+    put("BSP", new BSP());
   }};
   private String configAlgorithm;
   private int configSizeX;
@@ -18,7 +18,7 @@ public class MapGenerator {
 
   // Default config
   MapGenerator() {
-    configAlgorithm = "BST";
+    configAlgorithm = "BSP";
     configSizeX = 75;
     configSizeY = 50;
     configMinRoomSize = 10;
