@@ -2,6 +2,9 @@ import PCG.BSP;
 import PCG.Generator;
 import PCG.Util;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 public class MapGenerator {
@@ -10,40 +13,32 @@ public class MapGenerator {
     put("BSP", new BSP());
   }};
   private String configAlgorithm;
-  private int configSizeX;
-  private int configSizeY;
-  private int configMinRoomSize;
+  private int[] config;
 
   private String error;
 
   // Default config
   MapGenerator() {
     configAlgorithm = "BSP";
-    configSizeX = 75;
-    configSizeY = 50;
-    configMinRoomSize = 10;
+    config = new int[]{10, 75, 50};
     error = "        ";
+    map = new int[][] {{0,0},{0,0}};
   }
 
-  public void setAlgorithm( String algorithm ) {
-    configAlgorithm = algorithm;
+  public void setConfig( int[] pconfig ) {
+    config = pconfig;
   }
 
-  public void setMapSize( int sizeX, int sizeY ) {
-    configSizeX = sizeX;
-    configSizeY = sizeY;
-  }
-
-  public void setMinRoomSize( int minRoomSize ) {
-    configMinRoomSize = minRoomSize;
+  public void setConfigAlgorithm( String algo ) {
+    configAlgorithm = algo;
   }
 
   public int[][] generate() {
-    map = new int[configSizeY+1][configSizeX+1];
+//    map = new int[configSizeY+1][configSizeX+1];
     assert algos.containsKey(configAlgorithm) : "No algorithm";
     Generator g = algos.get(configAlgorithm);
     try {
-      map = g.generate(configMinRoomSize, configSizeX, configSizeY);
+      map = g.generate(config);
       error = "        ";
     }
     catch (AssertionError ex) {
@@ -64,4 +59,24 @@ public class MapGenerator {
   public int[][] getMap() {
     return map;
   }
+
+  public String[][] getConfigs( String algo ) {
+    assert algos.containsKey(configAlgorithm) : "No algorithm";
+    Generator g = algos.get(configAlgorithm);
+    return g.getConfigParameters();
+  }
+
+//  public void export() {
+//    try {
+//      FileOutputStream fileOut =
+//        new FileOutputStream("/tmp/employee.ser");
+//      ObjectOutputStream out = new ObjectOutputStream(fileOut);
+//      out.writeObject(e);
+//      out.close();
+//      fileOut.close();
+//      System.out.printf("Serialized data is saved in /tmp/employee.ser");
+//    } catch (IOException i) {
+//      i.printStackTrace();
+//    }
+//  }
 }

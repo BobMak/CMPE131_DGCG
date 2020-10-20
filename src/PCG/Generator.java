@@ -1,5 +1,7 @@
 package PCG;
 
 public interface Generator {
-  public int[][] generate(int minspace, int max_x, int max_y) throws Exception;
+  public int[][] generate(int[] config) throws Exception;
+
+  public String[][] getConfigParameters();
 }
