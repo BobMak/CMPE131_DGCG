@@ -66,17 +66,17 @@ public class MapGenerator {
     return g.getConfigParameters();
   }
 
-//  public void export() {
-//    try {
-//      FileOutputStream fileOut =
-//        new FileOutputStream("/tmp/employee.ser");
-//      ObjectOutputStream out = new ObjectOutputStream(fileOut);
-//      out.writeObject(e);
-//      out.close();
-//      fileOut.close();
-//      System.out.printf("Serialized data is saved in /tmp/employee.ser");
-//    } catch (IOException i) {
-//      i.printStackTrace();
-//    }
-//  }
+  public void export() {
+    try {
+      FileOutputStream fileOut =
+        new FileOutputStream("data/test.ser");
+      ObjectOutputStream out = new ObjectOutputStream(fileOut);
+      out.writeObject(new PCG.MapData(configAlgorithm, config, map));
+      out.close();
+      fileOut.close();
+      System.out.printf("Serialized data is saved in data/test.ser");
+    } catch (IOException i) {
+      i.printStackTrace();
+    }
+  }
 }

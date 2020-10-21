@@ -3,7 +3,6 @@ import PCG.Util;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
 
 public class GameFrame extends Frame {
   Screen screen;
@@ -50,6 +49,11 @@ public class GameFrame extends Frame {
       }
     });
     Button btnExport = new Button("Export");
+    btnExport.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
+        screen.getMapGenerator().export();
+      }
+    });
     btnExport.setSize(200, 60);
 
     controlPanel.add(btnGenerate,   FlowLayout.LEFT);
