@@ -1,17 +1,16 @@
-import PCG.Util;
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 public class GameFrame extends Frame {
   Screen screen;
   Panel controlPanel;
   Choice algorithms;
+  List savedMapsList;
 
   GameFrame() {
     JFrame fm = new JFrame();
@@ -29,11 +28,24 @@ public class GameFrame extends Frame {
     gbc.fill = GridBagConstraints.BOTH;
     fm.add(screen, gbc);
 
+    // Control Panel includes:
+    // buttons: generate, export, and import
+    // a saved maps list
+    // Algorithm dropdown
+    // dynamic configuration parameters list
+    Panel controlPanelOut = new Panel();
+    GridLayout glOut = new GridLayout(2,1);
+    glOut.setVgap(10);
+    controlPanelOut.setLayout(glOut);
     controlPanel = new Panel();
     GridLayout gl = new GridLayout(0,2);
     gl.setHgap(10);
-    gl.setHgap(5);
+    glOut.setVgap(10);
     controlPanel.setLayout(gl);
+
+    savedMapsList = new List();
+
+    Label algorithmsLabel = new Label("Algorithm");
     algorithms = new Choice();
     algorithms.addItem("BSP");
 
@@ -48,15 +60,8 @@ public class GameFrame extends Frame {
         try {
           MapGenerator m = screen.getMapGenerator();
           m.setConfigAlgorithm(algorithms.getItem(algorithms.getSelectedIndex()));
-          int configCount = (controlPanel.getComponentCount() - 4) / 2;
-          int[] config = new int[configCount];
-          // Get algorithm-specific configurations
-          for (int idx=0; idx<configCount; idx++) {
-            TextField configuration = (TextField)controlPanel.getComponent(2*idx+4);
-            config[idx] = Integer.parseInt(configuration.getText());
-            System.out.println(Integer.parseInt(configuration.getText()));
-          }
-          m.setConfig(config);
+          int[] configs = getConfigs();
+          m.setConfig(configs);
           screen.generate();
           errMsg.setText(m.getError());
         }
@@ -73,22 +78,32 @@ public class GameFrame extends Frame {
     Button btnExport = new Button("Export");
     btnExport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
-        screen.getMapGenerator().export();
+        screen.getMapGenerator().exportFile();
+        updateSavedList();
       }
     });
-    btnExport.setSize(200, 60);
-
-    controlPanel.add(btnGenerate);
+    Button btnImport = new Button("Import");
+    btnImport.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
+        String filename = savedMapsList.getSelectedItem();
+        screen.getMapGenerator().importFile(filename);
+        screen.repaint();
+      }
+    });
+    controlPanel.add(btnImport);
     controlPanel.add(btnExport);
+    controlPanel.add(btnGenerate);
     controlPanel.add(errMsg);
     controlPanel.add(algorithms);
-    controlPanel.doLayout();
+    controlPanel.add(algorithmsLabel);
     updateControlPanel("BSP");
-//    gbc.gridwidth = 1;
+    updateSavedList();
     gbc.gridx = 0;
     gbc.gridy = 0;
-    gbc.fill = GridBagConstraints.NONE;
-    fm.add(controlPanel, gbc);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    controlPanelOut.add(savedMapsList, gbc);
+    controlPanelOut.add(controlPanel, gbc);
+    fm.add(controlPanelOut, gbc);
     fm.doLayout();
     fm.setVisible(true);     //set frame visibilty true
     addWindowListener(new WindowAdapter(){
@@ -102,7 +117,7 @@ public class GameFrame extends Frame {
   private void updateControlPanel( String algorithm ) {
     String[][] configs = screen.getMapGenerator().getConfigs( algorithm );
     // remove all algorithm specific configuration fields
-    for (int idx=4; idx<controlPanel.getComponentCount(); idx++) {
+    for (int idx=6; idx<controlPanel.getComponentCount(); idx++) {
       controlPanel.remove(idx);
     }
     for ( String[] config: configs ) {
@@ -111,5 +126,26 @@ public class GameFrame extends Frame {
       controlPanel.add(field);
       controlPanel.add(lable);
     }
+  }
+
+  private void updateSavedList() {
+    savedMapsList.removeAll();
+    File f = new File("data/");
+    String[] allFiles = f.list();
+    if ( allFiles==null ) return;
+    for ( String filename : allFiles ) {
+      savedMapsList.add(filename);
+    }
+  }
+
+  private int[] getConfigs() {
+    int configCount = (controlPanel.getComponentCount() - 6) / 2;
+    int[] configs = new int[configCount];
+    // Get algorithm-specific configurations
+    for (int idx=0; idx<configCount; idx++) {
+      TextField configuration = (TextField)controlPanel.getComponent(2*idx+6);
+      configs[idx] = Integer.parseInt(configuration.getText());
+    }
+    return configs;
   }
 }

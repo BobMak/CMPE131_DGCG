@@ -3,12 +3,10 @@ import PCG.Generator;
 import PCG.MapData;
 import PCG.Util;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.HashMap;
 
-public class MapGenerator {
+public class MapGenerator<FileInputStreamStream> {
   private int[][] map;
   private HashMap<String, Generator> algos = new HashMap<String, Generator>(){{
     put("BSP", new BSP());
@@ -67,7 +65,7 @@ public class MapGenerator {
     return g.getConfigParameters();
   }
 
-  public void export() {
+  public void exportFile() {
     try {
       MapData md = new PCG.MapData(configAlgorithm, config, map);
       FileOutputStream fileOut =
@@ -76,8 +74,22 @@ public class MapGenerator {
       out.writeObject(md);
       out.close();
       fileOut.close();
-      System.out.printf("Serialized data is saved in data/test.ser");
     } catch (IOException i) {
+      i.printStackTrace();
+    }
+  }
+
+  public void importFile(String filename) {
+    try {
+      FileInputStream fileIn =
+        new FileInputStream("data/"+ filename);
+      ObjectInputStream objInp = new ObjectInputStream (fileIn);
+      MapData md = (MapData) objInp.readObject();
+      objInp.close();
+      fileIn.close();
+      config = md.getConfig();
+      map = md.getMap();
+    } catch (IOException | ClassNotFoundException i) {
       i.printStackTrace();
     }
   }

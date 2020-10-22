@@ -1,6 +1,8 @@
 package PCG;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 public class MapData implements java.io.Serializable  {
   int[][] map;
@@ -14,6 +16,18 @@ public class MapData implements java.io.Serializable  {
   }
 
   public String getString() {
-    return algorithm + "-" + Arrays.toString(config) + "-" + map.hashCode();
+    SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
+    Date date = new Date(System.currentTimeMillis());
+//    System.out.println(formatter.format(date));
+    return algorithm + "_" + Arrays.toString(config) + "_" + formatter.format(date);
+  }
+  public int[]   getConfig(){
+    return config;
+  }
+  public String  getAlgorithm(){
+    return algorithm;
+  }
+  public int[][] getMap(){
+    return map;
   }
 }
