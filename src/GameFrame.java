@@ -6,19 +6,19 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
-public class GameFrame extends Frame {
+public class GameFrame extends JFrame {
   Screen screen;
   Panel controlPanel;
   Choice algorithms;
   List savedMapsList;
 
   GameFrame() {
-    JFrame fm = new JFrame();
-    fm.setSize(1200, 800);   // setting frame size.
+//    JFrame this = new JFrame();
+    this.setSize(1200, 800);   // setting frame size.
     GridBagLayout gbl = new GridBagLayout();
     gbl.columnWeights = new double [] {0.1, 0.9};
     gbl.rowWeights = new double [] {1.0};
-    fm.setLayout(gbl);
+    this.setLayout(gbl);
     screen = new Screen();
     setPreferredSize(getSize());
     GridBagConstraints gbc = new GridBagConstraints();
@@ -26,7 +26,7 @@ public class GameFrame extends Frame {
     gbc.gridx = 1;
     gbc.gridy = 0;
     gbc.fill = GridBagConstraints.BOTH;
-    fm.add(screen, gbc);
+    this.add(screen, gbc);
 
     // Control Panel includes:
     // buttons: generate, export, and import
@@ -70,7 +70,7 @@ public class GameFrame extends Frame {
           System.out.println(ex);
         }
         controlPanel.doLayout();
-        fm.doLayout();
+//        this.doLayout();
         screen.repaint();
 //        screen.doLayout();
       }
@@ -103,13 +103,13 @@ public class GameFrame extends Frame {
     gbc.fill = GridBagConstraints.HORIZONTAL;
     controlPanelOut.add(savedMapsList, gbc);
     controlPanelOut.add(controlPanel, gbc);
-    fm.add(controlPanelOut, gbc);
-    fm.doLayout();
-    fm.setVisible(true);     //set frame visibilty true
+    this.add(controlPanelOut, gbc);
+    this.doLayout();
+    this.setVisible(true);     //set frame visibilty true
     addWindowListener(new WindowAdapter(){
       public void windowClosing(WindowEvent e) {
-        screen.quit = true;
         dispose();
+        System.exit(0);
       }
     });
   }

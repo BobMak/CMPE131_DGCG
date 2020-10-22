@@ -4,6 +4,9 @@ import PCG.MapData;
 import PCG.Util;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class MapGenerator<FileInputStreamStream> {
@@ -67,6 +70,10 @@ public class MapGenerator<FileInputStreamStream> {
 
   public void exportFile() {
     try {
+      File theDir = new File("data/");
+      if (!theDir.exists()){
+        theDir.mkdirs();
+      }
       MapData md = new PCG.MapData(configAlgorithm, config, map);
       FileOutputStream fileOut =
         new FileOutputStream("data/"+ md.getString() +".ser");
