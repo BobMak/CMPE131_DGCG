@@ -62,10 +62,16 @@ public class MapGenerator<FileInputStreamStream> {
     return map;
   }
 
-  public String[][] getConfigs( String algo ) {
+  public String getConfigAlgorithm() { return configAlgorithm; }
+
+  public String[][] getDefaultConfig(String algo ) {
     assert algos.containsKey(configAlgorithm) : "No algorithm";
     Generator g = algos.get(configAlgorithm);
     return g.getConfigParameters();
+  }
+
+  public int[] getConfig() {
+    return config;
   }
 
   public void exportFile() {
@@ -96,6 +102,7 @@ public class MapGenerator<FileInputStreamStream> {
       fileIn.close();
       config = md.getConfig();
       map = md.getMap();
+      configAlgorithm = md.getAlgorithm();
     } catch (IOException | ClassNotFoundException i) {
       i.printStackTrace();
     }

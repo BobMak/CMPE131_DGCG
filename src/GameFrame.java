@@ -86,7 +86,10 @@ public class GameFrame extends JFrame {
     btnImport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         String filename = savedMapsList.getSelectedItem();
-        screen.getMapGenerator().importFile(filename);
+        MapGenerator mg = screen.getMapGenerator();
+        mg.importFile(filename);
+//        resetControlPanelTo( "BSP" );
+        loadConfigurations();
         screen.repaint();
       }
     });
@@ -96,7 +99,7 @@ public class GameFrame extends JFrame {
     controlPanel.add(errMsg);
     controlPanel.add(algorithms);
     controlPanel.add(algorithmsLabel);
-    updateControlPanel("BSP");
+    resetControlPanelTo("BSP");
     updateSavedList();
     gbc.gridx = 0;
     gbc.gridy = 0;
@@ -114,8 +117,8 @@ public class GameFrame extends JFrame {
     });
   }
 
-  private void updateControlPanel( String algorithm ) {
-    String[][] configs = screen.getMapGenerator().getConfigs( algorithm );
+  private void resetControlPanelTo(String algorithm ) {
+    String[][] configs = screen.getMapGenerator().getDefaultConfig( algorithm );
     // remove all algorithm specific configuration fields
     for (int idx=6; idx<controlPanel.getComponentCount(); idx++) {
       controlPanel.remove(idx);
@@ -126,6 +129,18 @@ public class GameFrame extends JFrame {
       controlPanel.add(field);
       controlPanel.add(lable);
     }
+  }
+
+  private void loadConfigurations() {
+    int configCount = (controlPanel.getComponentCount() - 6) / 2;
+    MapGenerator mg = screen.getMapGenerator();
+    int[] configs = mg.getConfig();
+    for (int idx=0; idx<configCount; idx++) {
+      TextField configuration = (TextField)controlPanel.getComponent(2*idx+6);
+      configuration.setText( String.valueOf(configs[idx]));  //+configs[idx]
+      configuration.setVisible(true);
+    }
+    controlPanel.doLayout();
   }
 
   private void updateSavedList() {
