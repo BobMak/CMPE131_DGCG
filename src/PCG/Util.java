@@ -4,10 +4,11 @@ import java.util.Random;
 
 public class Util {
   public static int randint(int min, int max) {
-    Random rn = new Random();
-    int n = max - min + 1;
-    int i = rn.nextInt() % n;
-    return min + i;
+//    Random rn = new Random();
+//    int n = max - min + 1;
+//    int i = rn.nextInt() % n;
+//    return min + i;
+    return (int) ((Math.random() * (max - min)) + min);
   }
 
   // An Inplace function to rotate a N x N matrix
@@ -24,6 +25,11 @@ public class Util {
         mat[N - 1 - y][x] = temp;
       }
     }
+  }
+
+  static boolean randBool() {
+    Random rn = new Random();
+    return rn.nextBoolean();
   }
 
   public static void sop(Object msg){

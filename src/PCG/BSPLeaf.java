@@ -11,7 +11,10 @@ public class BSPLeaf {
   private BSPLeaf childLeft;
   private BSPLeaf childRight;
 
-  public BSPLeaf(int minsize, boolean splitDir, int x, int y, int w, int h) throws Exception {
+  public BSPLeaf(int minsize,
+                 boolean splitDir,
+                 int x, int y,
+                 int w, int h) throws Exception {
     // splitDir is a boolean direction of the split - true if horizontal, false if vertical
     posx = x;
     posy = y;
@@ -33,8 +36,12 @@ public class BSPLeaf {
       int new_h2 = (splitDir) ? h : h - splitLine;
       if (splitDir) assert new_w1 + new_w2 == w : "splitline is bad";
       else          assert new_h1 + new_h2 == h : "splitline is bad";
-      childLeft  = new BSPLeaf(minsize, !splitDir, new_x1, new_y1, new_w1, new_h1);
-      childRight = new BSPLeaf(minsize, !splitDir, new_x2, new_y2, new_w2, new_h2);
+      childLeft  = new BSPLeaf(minsize, !splitDir,
+        new_x1, new_y1,
+        new_w1, new_h1);
+      childRight = new BSPLeaf(minsize, !splitDir,
+        new_x2, new_y2,
+        new_w2, new_h2);
     }
   }
 
@@ -42,10 +49,10 @@ public class BSPLeaf {
     return new int[]{posx, posy, wid, hgt};
   }
 
-  public void placeRooms(int[][] map ) {
+  public void placeRooms(int[][] map, int[] bias ) {
     if ( childLeft != null ) {
-      childLeft.placeRooms(map);
-      childRight.placeRooms(map);
+      childLeft.placeRooms(map, bias);
+      childRight.placeRooms(map, bias);
 //      int[] room1 = childLeft.getRoom();
 //      int[] room2 = childRight.getRoom();
 //      min_x = Math.max(room1[0], room2[0]);
@@ -55,15 +62,17 @@ public class BSPLeaf {
       connectRooms(map, childLeft, childRight);
     }
     else {
-      int bias_x = Math.abs(Util.randint(0, 3));
-      int bias_y = Math.abs(Util.randint(0, 3));
-      min_x = posx+bias_x;
-      min_y = posy+bias_y;
-      max_x = posx+wid-1;
-      max_y = posy+hgt-1;
-      for (int x=bias_x; x<wid-1; x++) {
-        for (int y=bias_y; y<hgt; y++) {
-          map[posy+y][posx+x] = 1;
+      int bias_x_left = Math.abs(Util.randint(bias[0], bias[1]));
+      int bias_x_right = Math.abs(Util.randint(bias[0], bias[1]));
+      int bias_y_top = Math.abs(Util.randint(bias[2], bias[3]));
+      int bias_y_bottom = Math.abs(Util.randint(bias[2], bias[3]));
+      min_x = posx+bias_x_left;
+      min_y = posy+bias_y_top;
+      max_x = posx+wid-bias_x_right;
+      max_y = posy+hgt-bias_y_bottom;
+      for (int y=min_y; y<max_y; y++) {
+        for (int x=min_x; x<max_x; x++) {
+          map[y][x] = 1;
         }
       }
     }
