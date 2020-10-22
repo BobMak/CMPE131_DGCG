@@ -1,5 +1,7 @@
 package PCG;
 
+import java.util.Arrays;
+
 public class MapData implements java.io.Serializable  {
   int[][] map;
   String algorithm;
@@ -9,5 +11,9 @@ public class MapData implements java.io.Serializable  {
     map = pmap;
     config = pconfig;
     algorithm = palgorithm;
+  }
+
+  public String getString() {
+    return algorithm + "-" + Arrays.toString(config) + "-" + map.hashCode();
   }
 }

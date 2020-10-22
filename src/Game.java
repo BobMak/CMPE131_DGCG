@@ -10,7 +10,5 @@ public class Game {
 //      g.screen.repaint();
       Thread.sleep(3000);
     }
-    g.dispatchEvent(new WindowEvent(g, WindowEvent.WINDOW_CLOSING));
-    g.setVisible(false);
   }
 }

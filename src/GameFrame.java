@@ -1,8 +1,12 @@
 import PCG.Util;
 
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class GameFrame extends Frame {
   Screen screen;
@@ -10,12 +14,26 @@ public class GameFrame extends Frame {
   Choice algorithms;
 
   GameFrame() {
-    Frame fm = new Frame();
-    fm.setSize(1200, 800);   //setting frame size.
+    JFrame fm = new JFrame();
+    fm.setSize(1200, 800);   // setting frame size.
+    GridBagLayout gbl = new GridBagLayout();
+    gbl.columnWeights = new double [] {0.1, 0.9};
+    gbl.rowWeights = new double [] {1.0};
+    fm.setLayout(gbl);
     screen = new Screen();
-    fm.add(screen, BorderLayout.CENTER);
+    setPreferredSize(getSize());
+    GridBagConstraints gbc = new GridBagConstraints();
+//    gbc.gridwidth = 5;
+    gbc.gridx = 1;
+    gbc.gridy = 0;
+    gbc.fill = GridBagConstraints.BOTH;
+    fm.add(screen, gbc);
 
     controlPanel = new Panel();
+    GridLayout gl = new GridLayout(0,2);
+    gl.setHgap(10);
+    gl.setHgap(5);
+    controlPanel.setLayout(gl);
     algorithms = new Choice();
     algorithms.addItem("BSP");
 
@@ -34,8 +52,9 @@ public class GameFrame extends Frame {
           int[] config = new int[configCount];
           // Get algorithm-specific configurations
           for (int idx=0; idx<configCount; idx++) {
-            TextField configuration = (TextField)controlPanel.getComponent(1 + 2*idx);
+            TextField configuration = (TextField)controlPanel.getComponent(2*idx+4);
             config[idx] = Integer.parseInt(configuration.getText());
+            System.out.println(Integer.parseInt(configuration.getText()));
           }
           m.setConfig(config);
           screen.generate();
@@ -43,9 +62,12 @@ public class GameFrame extends Frame {
         }
         catch (Exception ex) {
           errMsg.setText("Error:"+ex);
+          System.out.println(ex);
         }
         controlPanel.doLayout();
+        fm.doLayout();
         screen.repaint();
+//        screen.doLayout();
       }
     });
     Button btnExport = new Button("Export");
@@ -56,27 +78,38 @@ public class GameFrame extends Frame {
     });
     btnExport.setSize(200, 60);
 
-    controlPanel.add(btnGenerate,   FlowLayout.LEFT);
-    controlPanel.add(btnExport,     FlowLayout.LEFT);
-    controlPanel.add(errMsg,        FlowLayout.LEFT);
-    controlPanel.add(algorithms,    FlowLayout.LEFT);
+    controlPanel.add(btnGenerate);
+    controlPanel.add(btnExport);
+    controlPanel.add(errMsg);
+    controlPanel.add(algorithms);
+    controlPanel.doLayout();
     updateControlPanel("BSP");
-    fm.add(controlPanel, BorderLayout.SOUTH);
-
+//    gbc.gridwidth = 1;
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    fm.add(controlPanel, gbc);
+    fm.doLayout();
     fm.setVisible(true);     //set frame visibilty true
+    addWindowListener(new WindowAdapter(){
+      public void windowClosing(WindowEvent e) {
+        screen.quit = true;
+        dispose();
+      }
+    });
   }
 
   private void updateControlPanel( String algorithm ) {
     String[][] configs = screen.getMapGenerator().getConfigs( algorithm );
     // remove all algorithm specific configuration fields
-    for (int idx=0; idx<controlPanel.getComponentCount()-4; idx++) {
+    for (int idx=4; idx<controlPanel.getComponentCount(); idx++) {
       controlPanel.remove(idx);
     }
     for ( String[] config: configs ) {
       Label     lable = new Label(config[0]);
       TextField field = new TextField(config[1]);
-      controlPanel.add(field, FlowLayout.LEFT);
-      controlPanel.add(lable, FlowLayout.LEFT);
+      controlPanel.add(field);
+      controlPanel.add(lable);
     }
   }
 }

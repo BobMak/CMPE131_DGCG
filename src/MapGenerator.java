@@ -1,5 +1,6 @@
 import PCG.BSP;
 import PCG.Generator;
+import PCG.MapData;
 import PCG.Util;
 
 import java.io.FileOutputStream;
@@ -68,10 +69,11 @@ public class MapGenerator {
 
   public void export() {
     try {
+      MapData md = new PCG.MapData(configAlgorithm, config, map);
       FileOutputStream fileOut =
-        new FileOutputStream("data/test.ser");
+        new FileOutputStream("data/"+ md.getString() +".ser");
       ObjectOutputStream out = new ObjectOutputStream(fileOut);
-      out.writeObject(new PCG.MapData(configAlgorithm, config, map));
+      out.writeObject(md);
       out.close();
       fileOut.close();
       System.out.printf("Serialized data is saved in data/test.ser");

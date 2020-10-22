@@ -8,8 +8,9 @@ public class BSP implements Generator {
 
   public int[][] generate(int[] config) throws Exception {
     // config: max room size, width, height
-    int[][] map  = new int[config[0]][config[1]];
-    BSPLeaf base = new BSPLeaf( config[2], true, 0, 0, config[1]-1, config[0]-1 );
+    System.out.println("Generating: room max: "+config[0]+" w: "+config[1]+" h: "+ config[2]);
+    int[][] map  = new int[config[2]][config[1]];
+    BSPLeaf base = new BSPLeaf( config[0], true, 0, 0, config[1]-1, config[2]-1 );
     base.placeRooms(map);
     base.removeDeadEnds(map);
     base.removeDeadEnds(map);
