@@ -14,15 +14,19 @@ public class BSPLeaf {
   public BSPLeaf(int minsize,
                  boolean splitDir,
                  int x, int y,
-                 int w, int h) throws Exception {
+                 int w, int h,
+                 int maxSplitRatio) throws Exception {
     // splitDir is a boolean direction of the split - true if horizontal, false if vertical
     posx = x;
     posy = y;
     wid = w;
     hgt = h;
     if ( minsize < w && minsize < h ) {
-      int splitLine = (splitDir) ? w / 2 : h / 2;
-      splitLine += Util.randint(0, 3);
+      // Determine how far from the center of the leaf is the split
+      // 1/2 means even. The bigger maxSplitRatio, the more random it is
+      int splitLine = (splitDir) ? w : h ;
+      int maxSplitDiff = splitLine/2 - splitLine / maxSplitRatio;
+      splitLine = splitLine/2 + Util.randint(0, maxSplitDiff);
       if (splitDir) assert splitLine < w : "splitline is bad";
       else          assert splitLine < h : "splitline is bad";
       assert splitLine > 0 : "splitline is negative";
@@ -38,10 +42,12 @@ public class BSPLeaf {
       else          assert new_h1 + new_h2 == h : "splitline is bad";
       childLeft  = new BSPLeaf(minsize, !splitDir,
         new_x1, new_y1,
-        new_w1, new_h1);
+        new_w1, new_h1,
+        maxSplitRatio);
       childRight = new BSPLeaf(minsize, !splitDir,
         new_x2, new_y2,
-        new_w2, new_h2);
+        new_w2, new_h2,
+        maxSplitRatio);
     }
   }
 
