@@ -21,10 +21,15 @@ public class BSPLeaf {
     posy = y;
     wid = w;
     hgt = h;
-    if ( minsize < w && minsize < h ) {
+    if ( minsize < w || minsize < h ) {
       // Determine how far from the center of the leaf is the split
       // 1/2 means even. The bigger maxSplitRatio, the more random it is
       int splitLine = (splitDir) ? w : h ;
+      // If room is already small enough in current direction, split in different direction
+      if ( splitLine < minsize ) {
+        splitDir = !splitDir;
+        splitLine = (splitDir) ? w : h ;
+      }
       int maxSplitDiff = splitLine/2 - splitLine / maxSplitRatio;
       splitLine = splitLine/2 + Util.randint(0, maxSplitDiff);
       if (splitDir) assert splitLine < w : "splitline is bad";
