@@ -6,13 +6,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
-public class GameFrame extends JFrame {
+public class GUI extends JFrame {
   Screen screen;
   Panel controlPanel;
   Choice algorithms;
   List savedMapsList;
 
-  GameFrame() {
+  GUI() {
 //    JFrame this = new JFrame();
     this.setSize(1200, 800);   // setting frame size.
     GridBagLayout gbl = new GridBagLayout();
