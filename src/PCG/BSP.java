@@ -3,7 +3,7 @@ package PCG;
 public class BSP implements Generator {
   public String[][] getConfigParameters() {
     return new String [][]{
-      {"max room size", "10"},
+      {"max room dimension", "10"},
       {"width", "60"},
       {"height", "50"},
       {"min horizontal margin", "1"},
