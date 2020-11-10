@@ -14,7 +14,6 @@ public class Screen extends JPanel implements ActionListener {
   private final int[][] tiles = {
           {10,10,10}, {100,100,100}, {10,10,180},
   };
-  private final int TILE = 20;
 
   public Screen() {
     quit = false;
@@ -39,15 +38,25 @@ public class Screen extends JPanel implements ActionListener {
     Toolkit.getDefaultToolkit().sync();
   }
 
+
   private void doDrawing(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
     int [][] thismap = mapGenerator.getMap();
     int []   clr;
+    int currentDisplayHeight = this.getHeight();
+    int currentDisplayWidth  = this.getWidth();
+    float tileSize = Math.min(
+      (float) currentDisplayHeight/thismap.length,
+      (float) currentDisplayWidth/thismap[0].length );
     for (int y=0; y< thismap.length ; y++) {
       for (int x=0; x<thismap[0].length ; x++) {
         clr = tiles[thismap[y][x]];
         g2d.setColor(new Color(clr[0], clr[1], clr[2]));
-        g2d.fillRect(x * TILE, y * TILE, TILE, TILE);
+        g2d.fillRect(
+          Math.round(x * tileSize),
+          Math.round(y * tileSize),
+          (int)Math.ceil(tileSize),
+          (int)Math.ceil(tileSize));
       }
     }
   }
