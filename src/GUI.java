@@ -44,7 +44,7 @@ public class GUI extends JFrame {
     savedMapsList = new List();
     savedMapsList.setFont(new Font("Arial", Font.PLAIN, 15));
 
-    Label enableGridLable = new Label("Enable Grid");
+    JLabel enableGridLable = new JLabel("Enable Grid");
     enableGridLable.setFont(new Font("Arial", Font.PLAIN, 15));
     Checkbox enableGrid = new Checkbox();
     enableGrid.addItemListener(new ItemListener(){
@@ -54,20 +54,20 @@ public class GUI extends JFrame {
       }
     });
 
-    Label mapNameLabel = new Label("Name");
+    JLabel mapNameLabel = new JLabel("Name");
     mapNameLabel.setFont(new Font("Arial", Font.PLAIN, 15));
     mapName = new JTextField();
     mapName.setFont(new Font("Arial", Font.PLAIN, 15));
     mapName.setToolTipText("Layout name. If not specified, " +
       "will using algorithm's name, configuration, and current time");
 
-    Label algorithmsLabel = new Label("Algorithm");
+    JLabel algorithmsLabel = new JLabel("Algorithm");
     algorithmsLabel.setFont(new Font("Arial", Font.PLAIN, 15));
     algorithms = new Choice();
     algorithms.addItem("BSP");
     algorithms.setFont(new Font("Arial", Font.PLAIN, 15));
 
-    Label errMsg = new Label();
+    JLabel errMsg = new JLabel();
     errMsg.setText("");
     errMsg.setForeground(new Color(230, 0, 0));
     errMsg.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -89,7 +89,7 @@ public class GUI extends JFrame {
           errMsg.setText("Error:"+ex);
           System.out.println(ex);
         }
-        controlPanel.doLayout();
+//        controlPanel.doLayout();
 //        this.doLayout();
         screen.repaint();
 //        screen.doLayout();
@@ -153,7 +153,7 @@ public class GUI extends JFrame {
       controlPanel.remove(idx);
     }
     for ( String[] config: configs ) {
-      Label     lable = new Label(config[0]);
+      JLabel     lable = new JLabel(config[0]);
       JTextField field = new JTextField(config[1]);
       lable.setFont(new Font("Arial", Font.PLAIN, 15));
       field.setFont(new Font("Arial", Font.PLAIN, 15));
