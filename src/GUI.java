@@ -8,6 +8,7 @@ public class GUI extends JFrame {
   Panel controlPanel;
   Choice algorithms;
   List savedMapsList;
+  JTextField mapName;
   int mainComponentsNumber;
 
   GUI() {
@@ -20,7 +21,6 @@ public class GUI extends JFrame {
     screen = new Screen();
     setPreferredSize(getSize());
     GridBagConstraints gbc = new GridBagConstraints();
-//    gbc.gridwidth = 5;
     gbc.gridx = 1;
     gbc.gridy = 0;
     gbc.fill = GridBagConstraints.BOTH;
@@ -51,7 +51,15 @@ public class GUI extends JFrame {
       @Override
       public void itemStateChanged(ItemEvent e) {
         screen.toggleGrid();
-      }});
+      }
+    });
+
+    Label mapNameLabel = new Label("Name");
+    mapNameLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+    mapName = new JTextField();
+    mapName.setFont(new Font("Arial", Font.PLAIN, 15));
+    mapName.setToolTipText("Layout name. If not specified, " +
+      "will using algorithm's name, configuration, and current time");
 
     Label algorithmsLabel = new Label("Algorithm");
     algorithmsLabel.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -91,7 +99,9 @@ public class GUI extends JFrame {
     btnExport.setFont(new Font("Arial", Font.PLAIN, 15));
     btnExport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
-        screen.getMapGenerator().exportFile();
+        MapGenerator gen = screen.getMapGenerator();
+        gen.exportFile( mapName.getText() );
+        mapName.setText("");
         updateSavedList();
       }
     });
@@ -113,6 +123,8 @@ public class GUI extends JFrame {
     controlPanel.add(errMsg);
     controlPanel.add(enableGrid);
     controlPanel.add(enableGridLable);
+    controlPanel.add(mapName);
+    controlPanel.add(mapNameLabel);
     controlPanel.add(algorithms);
     controlPanel.add(algorithmsLabel);
     mainComponentsNumber = controlPanel.getComponentCount();
@@ -142,9 +154,10 @@ public class GUI extends JFrame {
     }
     for ( String[] config: configs ) {
       Label     lable = new Label(config[0]);
-      TextField field = new TextField(config[1]);
+      JTextField field = new JTextField(config[1]);
       lable.setFont(new Font("Arial", Font.PLAIN, 15));
       field.setFont(new Font("Arial", Font.PLAIN, 15));
+      field.setToolTipText(config[2]);
       controlPanel.add(field);
       controlPanel.add(lable);
     }
@@ -155,7 +168,7 @@ public class GUI extends JFrame {
     MapGenerator mg = screen.getMapGenerator();
     int[] configs = mg.getConfig();
     for (int idx=0; idx<configCount; idx++) {
-      TextField configuration = (TextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
+      JTextField configuration = (JTextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
       configuration.setText( String.valueOf(configs[idx]));  //+configs[idx]
       configuration.setVisible(true);
     }
@@ -177,7 +190,7 @@ public class GUI extends JFrame {
     int[] configs = new int[configCount];
     // Get algorithm-specific configurations
     for (int idx=0; idx<configCount; idx++) {
-      TextField configuration = (TextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
+      JTextField configuration = (JTextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
       configs[idx] = Integer.parseInt(configuration.getText());
     }
     return configs;

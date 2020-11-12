@@ -64,12 +64,6 @@ public class BSPLeaf {
     if ( childLeft != null ) {
       childLeft.placeRooms(map, bias);
       childRight.placeRooms(map, bias);
-//      int[] room1 = childLeft.getRoom();
-//      int[] room2 = childRight.getRoom();
-//      min_x = Math.max(room1[0], room2[0]);
-//      min_y = Math.max(room1[1], room2[1]);
-//      max_x = Math.min(room1[2], room2[2]);
-//      max_y = Math.min(room1[3], room2[3]);
       connectRooms(map, childLeft, childRight);
     }
     else {
@@ -164,6 +158,23 @@ public class BSPLeaf {
       }
     }
     return removedSomething;
+  }
+
+  private boolean isFrame( int[][] map, int x, int y ) {
+    return false;
+  }
+
+
+  public void placeDoors( int[][] map ) {
+    for ( int y=1; y< map.length-1; y++ ) {
+      for ( int x=1; x<map[0].length-1; x++ ) {
+        if ( isTail(map, x, y) || isStub(map, x, y) ) {
+          if ( isFrame( map, x, y ) ) {
+
+          }
+        }
+      }
+    }
   }
 }
 

@@ -4,9 +4,6 @@ import PCG.MapData;
 import PCG.Util;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class MapGenerator<FileInputStreamStream> {
@@ -18,7 +15,6 @@ public class MapGenerator<FileInputStreamStream> {
   private int[] config;
 
   private String error;
-
   // Default config
   MapGenerator() {
     configAlgorithm = "BSP";
@@ -36,7 +32,6 @@ public class MapGenerator<FileInputStreamStream> {
   }
 
   public int[][] generate() {
-//    map = new int[configSizeY+1][configSizeX+1];
     assert algos.containsKey(configAlgorithm) : "No algorithm";
     Generator g = algos.get(configAlgorithm);
     try {
@@ -62,9 +57,11 @@ public class MapGenerator<FileInputStreamStream> {
     return map;
   }
 
-  public String getConfigAlgorithm() { return configAlgorithm; }
+  public String getConfigAlgorithm() {
+    return configAlgorithm;
+  }
 
-  public String[][] getDefaultConfig(String algo ) {
+  public String[][] getDefaultConfig( String algo ) {
     assert algos.containsKey(configAlgorithm) : "No algorithm";
     Generator g = algos.get(configAlgorithm);
     return g.getConfigParameters();
@@ -74,15 +71,22 @@ public class MapGenerator<FileInputStreamStream> {
     return config;
   }
 
-  public void exportFile() {
+  public void exportFile( String customName ) {
     try {
       File theDir = new File("data/");
       if (!theDir.exists()){
         theDir.mkdirs();
       }
       MapData md = new PCG.MapData(configAlgorithm, config, map);
+      String filename;
+      if ( customName.length() > 0 ) {
+        filename = customName;
+      }
+      else {
+        filename = md.getString();
+      }
       FileOutputStream fileOut =
-        new FileOutputStream("data/"+ md.getString() +".ser");
+        new FileOutputStream("data/"+ filename +".ser");
       ObjectOutputStream out = new ObjectOutputStream(fileOut);
       out.writeObject(md);
       out.close();

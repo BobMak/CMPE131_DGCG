@@ -1,6 +1,6 @@
 package PCG;
 
-public class Tunneling implements Generator {
+public class Tunneler implements Generator {
   @Override
   public int[][] generate(int[] config) throws Exception {
     return new int[0][];
