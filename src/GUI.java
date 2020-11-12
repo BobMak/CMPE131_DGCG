@@ -44,17 +44,22 @@ public class GUI extends JFrame {
     controlPanel.setLayout(gl);
 
     savedMapsList = new List();
+    savedMapsList.setFont(new Font("Arial", Font.PLAIN, 15));
 
     Label algorithmsLabel = new Label("Algorithm");
+    algorithmsLabel.setFont(new Font("Arial", Font.PLAIN, 15));
     algorithms = new Choice();
     algorithms.addItem("BSP");
+    algorithms.setFont(new Font("Arial", Font.PLAIN, 15));
 
     Label errMsg = new Label();
     errMsg.setText("");
     errMsg.setForeground(new Color(230, 0, 0));
+    errMsg.setFont(new Font("Arial", Font.PLAIN, 15));
 
     Button btnGenerate = new Button("Generate");
     btnGenerate.setSize(200, 60);
+    btnGenerate.setFont(new Font("Arial", Font.PLAIN, 15));
     btnGenerate.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         try {
@@ -76,6 +81,7 @@ public class GUI extends JFrame {
       }
     });
     Button btnExport = new Button("Export");
+    btnExport.setFont(new Font("Arial", Font.PLAIN, 15));
     btnExport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         screen.getMapGenerator().exportFile();
@@ -83,6 +89,7 @@ public class GUI extends JFrame {
       }
     });
     Button btnImport = new Button("Import");
+    btnImport.setFont(new Font("Arial", Font.PLAIN, 15));
     btnImport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         String filename = savedMapsList.getSelectedItem();
@@ -126,6 +133,8 @@ public class GUI extends JFrame {
     for ( String[] config: configs ) {
       Label     lable = new Label(config[0]);
       TextField field = new TextField(config[1]);
+      lable.setFont(new Font("Arial", Font.PLAIN, 15));
+      field.setFont(new Font("Arial", Font.PLAIN, 15));
       controlPanel.add(field);
       controlPanel.add(lable);
     }
