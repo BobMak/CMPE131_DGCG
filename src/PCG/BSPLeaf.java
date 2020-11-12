@@ -125,10 +125,10 @@ public class BSPLeaf {
           {  1,  1,  1 }, },
         { { -1, -1, -1 },
           { -1,  1, -1 },
-          { -1,  1,  1 }, },
+          { -1,  2,  1 }, },
         { { -1, -1, -1 },
           { -1,  1, -1 },
-          {  1,  1, -1 }, } };
+          {  1,  2, -1 }, } };
     int sum;
     for ( int[][] pattern : stubPatterns ) {
       // there are 4 possible directions of the pattern, so rotate and check 4 times
@@ -153,14 +153,17 @@ public class BSPLeaf {
             + map[y+1][x-1] + map[y+1][x] + map[y+1][x+1]) < 2;
   }
 
-  public void removeDeadEnds( int[][] map ) {
+  public boolean removeDeadEnds( int[][] map ) {
+    boolean removedSomething = false;
     for ( int y=1; y< map.length-1; y++ ) {
       for ( int x=1; x<map[0].length-1; x++ ) {
         if ( isTail(map, x, y) || isStub(map, x, y) ) {
           map[y][x] = 0;
+          removedSomething = true;
         }
       }
     }
+    return removedSomething;
   }
 }
 

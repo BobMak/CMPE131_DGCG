@@ -24,9 +24,11 @@ public class BSP implements Generator {
       config[1]-1, config[2]-1,
       config[7]);
     base.placeRooms(map, new int[]{ config[3], config[4], config[5], config[6] });
-    base.removeDeadEnds(map);
-    base.removeDeadEnds(map);
-    base.removeDeadEnds(map);
+    while ( true ) {
+      if ( !base.removeDeadEnds(map) ) {
+        break;
+      }
+    }
     return map;
   }
 
