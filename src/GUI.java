@@ -172,10 +172,9 @@ public class GUI extends JFrame {
   }
 
   private void loadConfigurations() {
-    int configCount = (controlPanel.getComponentCount() - mainComponentsNumber);
+    int configCount = (controlPanel.getComponentCount() - mainComponentsNumber)/2;
     MapGenerator mg = screen.getMapGenerator();
     int[] configs = mg.getConfig();
-    String[][] defalutConfigs = mg.getDefaultConfig();
     for (int idx=0; idx<configCount; idx++) {
       JTextField configuration = (JTextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
       configuration.setText( String.valueOf(configs[idx]));  //+configs[idx]
