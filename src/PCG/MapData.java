@@ -21,7 +21,7 @@ public class MapData implements java.io.Serializable  {
 //    System.out.println(formatter.format(date));
     return algorithm + "_" + Arrays.toString(config) + "_" + formatter.format(date);
   }
-  public int[]   getConfig(){
+  public int[] getConfig(){
     return config;
   }
   public String  getAlgorithm(){

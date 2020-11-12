@@ -18,7 +18,11 @@ public class MapGenerator<FileInputStreamStream> {
   // Default config
   MapGenerator() {
     configAlgorithm = "BSP";
-    config = new int[]{10, 75, 50};
+    String[][] strConfigs = getDefaultConfig();
+    config = new int[ strConfigs.length ];
+    for ( int idx=0; idx< strConfigs.length; idx++ ) {
+      config[idx] = Integer.parseInt(strConfigs[idx][1]);
+    }
     error = "        ";
     map = new int[][] {{0,0},{0,0}};
   }
@@ -61,7 +65,7 @@ public class MapGenerator<FileInputStreamStream> {
     return configAlgorithm;
   }
 
-  public String[][] getDefaultConfig( String algo ) {
+  public String[][] getDefaultConfig() {
     assert algos.containsKey(configAlgorithm) : "No algorithm";
     Generator g = algos.get(configAlgorithm);
     return g.getConfigParameters();

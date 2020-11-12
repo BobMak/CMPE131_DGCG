@@ -5,10 +5,11 @@ import java.io.File;
 
 public class GUI extends JFrame {
   Screen screen;
-  Panel controlPanel;
+  JPanel controlPanel;
   Choice algorithms;
   List savedMapsList;
   JTextField mapName;
+  Button btnExport;
   int mainComponentsNumber;
 
   GUI() {
@@ -26,16 +27,16 @@ public class GUI extends JFrame {
     gbc.fill = GridBagConstraints.BOTH;
     this.add(screen, gbc);
 
-    // Control Panel includes:
+    // Control JPanel includes:
     // buttons: generate, export, and import
     // a saved maps list
     // Algorithm dropdown
     // dynamic configuration parameters list
-    Panel controlPanelOut = new Panel();
+    JPanel controlPanelOut = new JPanel();
     GridLayout glOut = new GridLayout(2,1);
     glOut.setVgap(10);
     controlPanelOut.setLayout(glOut);
-    controlPanel = new Panel();
+    controlPanel = new JPanel();
     GridLayout gl = new GridLayout(0,2);
     gl.setHgap(10);
     glOut.setVgap(10);
@@ -46,6 +47,8 @@ public class GUI extends JFrame {
 
     JLabel enableGridLable = new JLabel("Enable Grid");
     enableGridLable.setFont(new Font("Arial", Font.PLAIN, 15));
+    enableGridLable.setToolTipText("Toggle Grid. Can make , " +
+      "will using algorithm's name, configuration, and current time");
     Checkbox enableGrid = new Checkbox();
     enableGrid.addItemListener(new ItemListener(){
       @Override
@@ -56,6 +59,8 @@ public class GUI extends JFrame {
 
     JLabel mapNameLabel = new JLabel("Name");
     mapNameLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+    mapNameLabel.setToolTipText("Layout name. If not specified, " +
+      "will using algorithm's name, configuration, and current time");
     mapName = new JTextField();
     mapName.setFont(new Font("Arial", Font.PLAIN, 15));
     mapName.setToolTipText("Layout name. If not specified, " +
@@ -78,6 +83,7 @@ public class GUI extends JFrame {
     btnGenerate.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         try {
+          btnExport.setEnabled(true);
           MapGenerator m = screen.getMapGenerator();
           m.setConfigAlgorithm(algorithms.getItem(algorithms.getSelectedIndex()));
           int[] configs = getConfigs();
@@ -95,7 +101,8 @@ public class GUI extends JFrame {
 //        screen.doLayout();
       }
     });
-    Button btnExport = new Button("Export");
+    btnExport = new Button("Export");
+    btnExport.setEnabled(false);
     btnExport.setFont(new Font("Arial", Font.PLAIN, 15));
     btnExport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
@@ -147,7 +154,7 @@ public class GUI extends JFrame {
   }
 
   private void resetControlPanelTo(String algorithm ) {
-    String[][] configs = screen.getMapGenerator().getDefaultConfig( algorithm );
+    String[][] configs = screen.getMapGenerator().getDefaultConfig();
     // remove all algorithm specific configuration fields
     for (int idx=mainComponentsNumber; idx<controlPanel.getComponentCount(); idx++) {
       controlPanel.remove(idx);
@@ -156,6 +163,7 @@ public class GUI extends JFrame {
       JLabel     lable = new JLabel(config[0]);
       JTextField field = new JTextField(config[1]);
       lable.setFont(new Font("Arial", Font.PLAIN, 15));
+      lable.setToolTipText(config[2]);
       field.setFont(new Font("Arial", Font.PLAIN, 15));
       field.setToolTipText(config[2]);
       controlPanel.add(field);
@@ -164,15 +172,15 @@ public class GUI extends JFrame {
   }
 
   private void loadConfigurations() {
-    int configCount = (controlPanel.getComponentCount() - mainComponentsNumber) / 2;
+    int configCount = (controlPanel.getComponentCount() - mainComponentsNumber);
     MapGenerator mg = screen.getMapGenerator();
     int[] configs = mg.getConfig();
+    String[][] defalutConfigs = mg.getDefaultConfig();
     for (int idx=0; idx<configCount; idx++) {
       JTextField configuration = (JTextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
       configuration.setText( String.valueOf(configs[idx]));  //+configs[idx]
       configuration.setVisible(true);
     }
-    controlPanel.doLayout();
   }
 
   private void updateSavedList() {
