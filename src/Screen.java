@@ -9,6 +9,7 @@ import javax.swing.*;
 public class Screen extends JPanel implements ActionListener {
 
   private MapGenerator mapGenerator;
+  private boolean showGrid;
   public boolean quit;
 
   private final int[][] tiles = {
@@ -31,13 +32,17 @@ public class Screen extends JPanel implements ActionListener {
     return mapGenerator;
   }
 
+  public void toggleGrid() {
+    showGrid = !showGrid;
+    repaint();
+  }
+
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     doDrawing(g);
     Toolkit.getDefaultToolkit().sync();
   }
-
 
   private void doDrawing(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
@@ -57,6 +62,14 @@ public class Screen extends JPanel implements ActionListener {
           Math.round(y * tileSize),
           (int)Math.ceil(tileSize),
           (int)Math.ceil(tileSize));
+        if ( showGrid ) {
+          g2d.setColor(new Color(0,0, 0));
+          g2d.drawRect(
+            Math.round(x * tileSize),
+            Math.round(y * tileSize),
+            (int)Math.ceil(tileSize),
+            (int)Math.ceil(tileSize));
+        }
       }
     }
   }

@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 
 public class GUI extends JFrame {
@@ -11,6 +8,7 @@ public class GUI extends JFrame {
   Panel controlPanel;
   Choice algorithms;
   List savedMapsList;
+  int mainComponentsNumber;
 
   GUI() {
 //    JFrame this = new JFrame();
@@ -45,6 +43,15 @@ public class GUI extends JFrame {
 
     savedMapsList = new List();
     savedMapsList.setFont(new Font("Arial", Font.PLAIN, 15));
+
+    Label enableGridLable = new Label("Enable Grid");
+    enableGridLable.setFont(new Font("Arial", Font.PLAIN, 15));
+    Checkbox enableGrid = new Checkbox();
+    enableGrid.addItemListener(new ItemListener(){
+      @Override
+      public void itemStateChanged(ItemEvent e) {
+        screen.toggleGrid();
+      }});
 
     Label algorithmsLabel = new Label("Algorithm");
     algorithmsLabel.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -104,8 +111,11 @@ public class GUI extends JFrame {
     controlPanel.add(btnExport);
     controlPanel.add(btnGenerate);
     controlPanel.add(errMsg);
+    controlPanel.add(enableGrid);
+    controlPanel.add(enableGridLable);
     controlPanel.add(algorithms);
     controlPanel.add(algorithmsLabel);
+    mainComponentsNumber = controlPanel.getComponentCount();
     resetControlPanelTo("BSP");
     updateSavedList();
     gbc.gridx = 0;
@@ -127,7 +137,7 @@ public class GUI extends JFrame {
   private void resetControlPanelTo(String algorithm ) {
     String[][] configs = screen.getMapGenerator().getDefaultConfig( algorithm );
     // remove all algorithm specific configuration fields
-    for (int idx=6; idx<controlPanel.getComponentCount(); idx++) {
+    for (int idx=mainComponentsNumber; idx<controlPanel.getComponentCount(); idx++) {
       controlPanel.remove(idx);
     }
     for ( String[] config: configs ) {
@@ -141,11 +151,11 @@ public class GUI extends JFrame {
   }
 
   private void loadConfigurations() {
-    int configCount = (controlPanel.getComponentCount() - 6) / 2;
+    int configCount = (controlPanel.getComponentCount() - mainComponentsNumber) / 2;
     MapGenerator mg = screen.getMapGenerator();
     int[] configs = mg.getConfig();
     for (int idx=0; idx<configCount; idx++) {
-      TextField configuration = (TextField)controlPanel.getComponent(2*idx+6);
+      TextField configuration = (TextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
       configuration.setText( String.valueOf(configs[idx]));  //+configs[idx]
       configuration.setVisible(true);
     }
@@ -163,11 +173,11 @@ public class GUI extends JFrame {
   }
 
   private int[] getConfigs() {
-    int configCount = (controlPanel.getComponentCount() - 6) / 2;
+    int configCount = (controlPanel.getComponentCount() - mainComponentsNumber) / 2;
     int[] configs = new int[configCount];
     // Get algorithm-specific configurations
     for (int idx=0; idx<configCount; idx++) {
-      TextField configuration = (TextField)controlPanel.getComponent(2*idx+6);
+      TextField configuration = (TextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
       configs[idx] = Integer.parseInt(configuration.getText());
     }
     return configs;
