@@ -7,9 +7,9 @@ import java.util.Date;
 public class MapData implements java.io.Serializable  {
   int[][] map;
   String algorithm;
-  int[] config;
+  String[] config;
 
-  public MapData(String palgorithm, int[] pconfig, int[][] pmap){
+  public MapData(String palgorithm, String[] pconfig, int[][] pmap){
     map = pmap;
     config = pconfig;
     algorithm = palgorithm;
@@ -21,7 +21,7 @@ public class MapData implements java.io.Serializable  {
 //    System.out.println(formatter.format(date));
     return algorithm + "_" + Arrays.toString(config) + "_" + formatter.format(date);
   }
-  public int[] getConfig(){
+  public String[] getConfig(){
     return config;
   }
   public String  getAlgorithm(){

@@ -12,6 +12,8 @@ public class GUI extends JFrame {
   Button btnExport;
   int mainComponentsNumber;
 
+  MapGenerator mapGen;
+
   GUI() {
 //    JFrame this = new JFrame();
     this.setSize(1200, 800);   // setting frame size.
@@ -27,6 +29,7 @@ public class GUI extends JFrame {
     gbc.fill = GridBagConstraints.BOTH;
     this.add(screen, gbc);
 
+    mapGen = new MapGenerator();
     // Control JPanel includes:
     // buttons: generate, export, and import
     // a saved maps list
@@ -69,7 +72,9 @@ public class GUI extends JFrame {
     JLabel algorithmsLabel = new JLabel("Algorithm");
     algorithmsLabel.setFont(new Font("Arial", Font.PLAIN, 15));
     algorithms = new Choice();
-    algorithms.addItem("BSP");
+    for ( String algorithmID : mapGen.getAlgorithms() ) {
+      algorithms.addItem(algorithmID);
+    }
     algorithms.setFont(new Font("Arial", Font.PLAIN, 15));
 
     JLabel errMsg = new JLabel();
@@ -84,12 +89,11 @@ public class GUI extends JFrame {
       public void actionPerformed(ActionEvent e){
         try {
           btnExport.setEnabled(true);
-          MapGenerator m = screen.getMapGenerator();
-          m.setConfigAlgorithm(algorithms.getItem(algorithms.getSelectedIndex()));
-          int[] configs = getConfigs();
-          m.setConfig(configs);
+          mapGen.setConfigAlgorithm(algorithms.getItem(algorithms.getSelectedIndex()));
+          String[] configs = getConfigs();
+          mapGen.setConfig(configs);
           screen.generate();
-          errMsg.setText(m.getError());
+          errMsg.setText(mapGen.getError());
         }
         catch (Exception ex) {
           errMsg.setText("Error:"+ex);
@@ -106,8 +110,7 @@ public class GUI extends JFrame {
     btnExport.setFont(new Font("Arial", Font.PLAIN, 15));
     btnExport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
-        MapGenerator gen = screen.getMapGenerator();
-        gen.exportFile( mapName.getText() );
+        mapGen.exportFile( mapName.getText() );
         mapName.setText("");
         updateSavedList();
       }
@@ -117,8 +120,7 @@ public class GUI extends JFrame {
     btnImport.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         String filename = savedMapsList.getSelectedItem();
-        MapGenerator mg = screen.getMapGenerator();
-        mg.importFile(filename);
+        mapGen.importFile(filename);
 //        resetControlPanelTo( "BSP" );
         loadConfigurations();
         screen.repaint();
@@ -154,7 +156,7 @@ public class GUI extends JFrame {
   }
 
   private void resetControlPanelTo(String algorithm ) {
-    String[][] configs = screen.getMapGenerator().getDefaultConfig();
+    String[][] configs = mapGen.getDefaultConfig();
     // remove all algorithm specific configuration fields
     for (int idx=mainComponentsNumber; idx<controlPanel.getComponentCount(); idx++) {
       controlPanel.remove(idx);
@@ -173,11 +175,10 @@ public class GUI extends JFrame {
 
   private void loadConfigurations() {
     int configCount = (controlPanel.getComponentCount() - mainComponentsNumber)/2;
-    MapGenerator mg = screen.getMapGenerator();
-    int[] configs = mg.getConfig();
+    String[] configs = mapGen.getConfig();
     for (int idx=0; idx<configCount; idx++) {
       JTextField configuration = (JTextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
-      configuration.setText( String.valueOf(configs[idx]));  //+configs[idx]
+      configuration.setText( configs[idx]);  //+configs[idx]
       configuration.setVisible(true);
     }
   }
@@ -192,13 +193,13 @@ public class GUI extends JFrame {
     }
   }
 
-  private int[] getConfigs() {
+  private String[] getConfigs() {
     int configCount = (controlPanel.getComponentCount() - mainComponentsNumber) / 2;
-    int[] configs = new int[configCount];
+    String[] configs = new String[configCount];
     // Get algorithm-specific configurations
     for (int idx=0; idx<configCount; idx++) {
       JTextField configuration = (JTextField)controlPanel.getComponent(2*idx+mainComponentsNumber);
-      configs[idx] = Integer.parseInt(configuration.getText());
+      configs[idx] = configuration.getText();
     }
     return configs;
   }

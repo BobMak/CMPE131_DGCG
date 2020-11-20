@@ -1,7 +1,7 @@
 package PCG;
 
 public class BSP implements Generator {
-  public String[][] getConfigParameters() {
+  public String[][] getDefaultConfigParameters() {
     return new String [][]{
       {"max room dimension", "10",
         "Maximum width or height of the sector where the room will be generated. " +
@@ -29,17 +29,24 @@ public class BSP implements Generator {
         "The greater the X, the greater the variety"}};
   }
 
-  public int[][] generate(int[] config) throws Exception {
-    // config: max room size, width, height
+  public int[][] generate(String[] config) throws Exception {
     System.out.println("BSP: room max: "+config[0]
-      +" w: "+config[1]
+      +" w: "+ config[1]
       +" h: "+ config[2]);
-    int[][] map  = new int[config[2]][config[1]];
-    BSPLeaf base = new BSPLeaf( config[0], Util.randBool(),
+    int maxRoomDim = Integer.parseInt(config[0]);
+    int width      = Integer.parseInt(config[1]);
+    int height     = Integer.parseInt(config[2]);
+    int minHorMarg = Integer.parseInt(config[3]);
+    int maxHorMarg = Integer.parseInt(config[4]);
+    int minVerMarg = Integer.parseInt(config[5]);
+    int maxVerMarg = Integer.parseInt(config[6]);
+    int maxSpltRat = Integer.parseInt(config[7]);
+    int[][] map  = new int[height][width];
+    BSPLeaf base = new BSPLeaf( maxRoomDim, Util.randBool(),
       0, 0,
-      config[1]-1, config[2]-1,
-      config[7]);
-    base.placeRooms(map, new int[]{ config[3], config[4], config[5], config[6] });
+      width-1, height-1,
+      maxSpltRat);
+    base.placeRooms(map, new int[]{ minHorMarg, maxHorMarg, minVerMarg, maxVerMarg });
     while ( true ) {
       if ( !base.removeDeadEnds(map) ) {
         break;

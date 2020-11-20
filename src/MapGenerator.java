@@ -1,33 +1,31 @@
-import PCG.BSP;
-import PCG.Generator;
-import PCG.MapData;
-import PCG.Util;
+import PCG.*;
 
 import java.io.*;
 import java.util.HashMap;
 
 public class MapGenerator<FileInputStreamStream> {
   private int[][] map;
-  private HashMap<String, Generator> algos = new HashMap<String, Generator>(){{
+  private HashMap<String, Generator> strToAlgorithm = new HashMap<String, Generator>(){{
     put("BSP", new BSP());
+    put("Tunneler", new Tunneller());
   }};
   private String configAlgorithm;
-  private int[] config;
+  private String[] config;
 
   private String error;
   // Default config
   MapGenerator() {
-    configAlgorithm = "BSP";
+    configAlgorithm = "Tunneler";
     String[][] strConfigs = getDefaultConfig();
-    config = new int[ strConfigs.length ];
+    config = new String[ strConfigs.length ];
     for ( int idx=0; idx< strConfigs.length; idx++ ) {
-      config[idx] = Integer.parseInt(strConfigs[idx][1]);
+      config[idx] = strConfigs[idx][1];
     }
     error = "        ";
     map = new int[][] {{0,0},{0,0}};
   }
 
-  public void setConfig( int[] pconfig ) {
+  public void setConfig( String[] pconfig ) {
     config = pconfig;
   }
 
@@ -36,8 +34,8 @@ public class MapGenerator<FileInputStreamStream> {
   }
 
   public int[][] generate() {
-    assert algos.containsKey(configAlgorithm) : "No algorithm";
-    Generator g = algos.get(configAlgorithm);
+    assert strToAlgorithm.containsKey(configAlgorithm) : "No algorithm";
+    Generator g = strToAlgorithm.get(configAlgorithm);
     try {
       map = g.generate(config);
       error = "        ";
@@ -66,13 +64,17 @@ public class MapGenerator<FileInputStreamStream> {
   }
 
   public String[][] getDefaultConfig() {
-    assert algos.containsKey(configAlgorithm) : "No algorithm";
-    Generator g = algos.get(configAlgorithm);
-    return g.getConfigParameters();
+    assert strToAlgorithm.containsKey(configAlgorithm) : "No algorithm";
+    Generator g = strToAlgorithm.get(configAlgorithm);
+    return g.getDefaultConfigParameters();
   }
 
-  public int[] getConfig() {
+  public String[] getConfig() {
     return config;
+  }
+
+  public String[] getAlgorithms(){
+    return strToAlgorithm.keySet().toArray(new String[0]);
   }
 
   public void exportFile( String customName ) {

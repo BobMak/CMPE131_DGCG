@@ -1,7 +1,7 @@
 package PCG;
 
 public interface Generator {
-  public int[][] generate(int[] config) throws Exception;
+  public int[][] generate(String[] config) throws Exception;
 
-  public String[][] getConfigParameters();
+  public String[][] getDefaultConfigParameters();
 }
