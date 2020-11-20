@@ -106,7 +106,6 @@ public class Tunneller implements Generator {
         Util.sop("[WARNIGN] filed to find a starting area for a primary corridor");
       }
     int maxDist = Util.randint(distMin, distMax) / count;
-    int dist    = 0;
     // 1 - north, 2 - east, 3 - south, 4 - west
     int [][] digDirectionSteps = {
       {0,  1},
@@ -116,6 +115,7 @@ public class Tunneller implements Generator {
     };
     // make count number of corridors of length maxDist
     for ( int _=0; _<count; _++ ) {
+      int dist = 0;
       while ( dist < maxDist  ) {
         int travelDist = Util.randint(travelDistMin, travelDistMax);
         for (int step = 0; step < travelDist; step++) {
@@ -127,6 +127,7 @@ public class Tunneller implements Generator {
           tunnelerLocation[1] += digDirectionSteps[direction - 1][1];
           dist += 1;
         }
+        checkpoints.add( tunnelerLocation );
         int newDirection = getNewDirection(direction);
         // create a branch that goes in a different direction with this one.
         // Split remaining distance between this one and new one
@@ -154,6 +155,10 @@ public class Tunneller implements Generator {
         }
         direction = newDirection;
       }
+      int[][] chps = checkpoints.toArray(new int[0][]);
+      int idx = rnd.nextInt(chps.length);
+      int[] newDigPoint = chps[idx];
+      tunnelerLocation = getUnocupiedWithin(map, newDigPoint[0], newDigPoint[1], 60, width);
     }
   }
 

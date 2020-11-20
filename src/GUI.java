@@ -92,7 +92,7 @@ public class GUI extends JFrame {
           mapGen.setConfigAlgorithm(algorithms.getItem(algorithms.getSelectedIndex()));
           String[] configs = getConfigs();
           mapGen.setConfig(configs);
-          screen.generate();
+          screen.setMap( mapGen.generate() );
           errMsg.setText(mapGen.getError());
         }
         catch (Exception ex) {
