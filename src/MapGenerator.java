@@ -6,8 +6,8 @@ import java.util.HashMap;
 public class MapGenerator<FileInputStreamStream> {
   private int[][] map;
   private HashMap<String, Generator> strToAlgorithm = new HashMap<String, Generator>(){{
-    put("BSP", new BSP());
     put("Tunneler", new Tunneller());
+    put("BSP", new BSP());
   }};
   private String configAlgorithm;
   private String[] config;

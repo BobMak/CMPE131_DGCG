@@ -84,6 +84,7 @@ public class GUI extends JFrame {
         resetControlPanelTo(e.getItem().toString());
       }
     });
+    algorithms.select("BSP");
 
     JLabel errMsg = new JLabel();
     errMsg.setText("");
@@ -142,7 +143,7 @@ public class GUI extends JFrame {
     controlPanel.add(algorithms);
     controlPanel.add(algorithmsLabel);
     mainComponentsNumber = controlPanel.getComponentCount();
-//    resetControlPanelTo("BSP");
+    resetControlPanelTo("BSP");
     updateSavedList();
     gbc.gridx = 0;
     gbc.gridy = 0;
@@ -151,7 +152,7 @@ public class GUI extends JFrame {
     controlPanelOut.add(controlPanel, gbc);
     this.add(controlPanelOut, gbc);
     this.doLayout();
-    this.setVisible(true);     //set frame visibilty true
+    this.setVisible(true); // set frame visibilty true
     addWindowListener(new WindowAdapter(){
       public void windowClosing(WindowEvent e) {
         dispose();
@@ -181,8 +182,8 @@ public class GUI extends JFrame {
       controlPanel.add(field);
       controlPanel.add(lable);
     }
-    controlPanel.doLayout();
     this.doLayout();
+    this.setVisible(true); // set frame visibilty true
   }
 
   private void loadConfigurations() {
