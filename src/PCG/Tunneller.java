@@ -26,9 +26,11 @@ public class Tunneller implements Generator {
     int primeCorrDistMin = Integer.parseInt(config[6]);
     float primeCorrBranchProb = Float.parseFloat(config[7]);
     int primeCorrCount   = Integer.parseInt(config[8]);
-    int secCorrLenMax   = Integer.parseInt(config[9]);
-    int secCorrLenMin   = Integer.parseInt(config[10]);
-    int roomSparsity   = Integer.parseInt(config[11]);
+    int secCorrCount   = Integer.parseInt(config[9]);
+    int secCorrLenMax   = Integer.parseInt(config[10]);
+    int secCorrLenMin   = Integer.parseInt(config[11]);
+    int loopsCount      = Integer.parseInt(config[12]);
+    int roomSparsity    = Integer.parseInt(config[13]);
     // initialize map with bigger size so that it can feet the map while placing corridors and rooms
     int[][] map = new int[primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2][primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2];
     rnd = new Random();
@@ -38,12 +40,20 @@ public class Tunneller implements Generator {
     int tunnelerDirection = Util.randint(1, 4);
     checkpoints = new HashSet<int[]>(100);
     checkpoints.add( tunnelerLocation );
-    digMainCorridors(map,
+    // excavates primary corridors and leaves checkpoints around which rooms are to be placed
+    digPrimeCorridors(map,
       primeCorrLenMax, primeCorrLenMin,
       primeCorrWidth,   primeCorrCount,
       primeCorrDistMax, primeCorrDistMin,
       primeCorrBranchProb, tunnelerLocation,
       tunnelerDirection, roomSparsity);
+    // connects different primary corridors and adds loops
+    digSecondaryCorridors(map,
+      secCorrLenMax, secCorrLenMin,
+      secCorrCount,   roomSparsity,
+      tunnelerLocation, tunnelerDirection,
+      roomSparsity, loopsCount);
+    // places rooms in closest unoccupied area around every checkpoint
     digRooms(map, roomDimMax, roomDimMin);
 
     findBorders(map);
@@ -84,12 +94,14 @@ public class Tunneller implements Generator {
         "Length of the corridor"},
       {"secondary corridors length min", "90",
         "Length of the corridor"},
+      {"loops count", "3",
+        "Number of loops added with secondary corridors"},
       {"room sparsity", "5",
         "Place rooms every X steps along main corridors"},
     };
   }
 
-  private void digMainCorridors( int[][] map,
+  private void digPrimeCorridors(int[][] map,
                                  int distMax,
                                  int distMin,
                                  int width,
@@ -100,7 +112,7 @@ public class Tunneller implements Generator {
                                  int[] tunnelerLocation,
                                  int direction,
                                  int roomSparsity) throws Exception {
-    Util.sop("Digging prime corridor at " + tunnelerLocation);
+    Util.sop("Digging prime corridor at " + tunnelerLocation.toString());
     if ( isUnoccupied( map, tunnelerLocation[0], tunnelerLocation[1], width, width ) )
       tunnelerLocation = getUnocupiedWithin( map,
         tunnelerLocation[0], tunnelerLocation[1], 100, width );
@@ -151,7 +163,7 @@ public class Tunneller implements Generator {
             tunnelerLocation[0] + digDirectionSteps[branchDirection-1][0],
             tunnelerLocation[1] + digDirectionSteps[branchDirection-1][1]
           };
-          digMainCorridors(map,
+          digPrimeCorridors(map,
             distanceLeft / 2,
             distanceLeft / 2 - 1,
             width,
@@ -172,19 +184,32 @@ public class Tunneller implements Generator {
     }
   }
 
-  private void digRooms( int[][] map, int maxDims, int minDims ) {
-    Util.sop("Generating rooms");
-    for ( int[] chckp : checkpoints ) {
-      generateRoom( map, chckp[0], chckp[1], maxDims, minDims );
-    }
+  private void digSecondaryCorridors(int[][] map,
+                                     int secCorrLenMax,
+                                     int secCorrLenMin,
+                                     int secCorrCount,
+                                     int roomSparsity,
+                                     int[] tunnelerLocation,
+                                     int tunnelerDirection, int roomSparsity1, int loopsCount) {
+
   }
 
-  //
-  private void generateRoom( int[][] map, int x, int y, int maxd, int mind ) {
+  private void digRooms( int[][] map, int maxDims, int minDims ) {
+    Util.sop("Generating rooms around " + checkpoints.size()+ " checkpoints");
+    // count successfully generated rooms;
+    int _count = 0;
+    for ( int[] chckp : checkpoints ) {
+      _count += generateRoom( map, chckp[0], chckp[1], maxDims, minDims ) ? 1 : 0;
+    }
+    Util.sop("Generated " + _count + " rooms");
+  }
+
+  private boolean generateRoom( int[][] map, int x, int y, int maxd, int mind ) {
     int room_width  = Util.randint( mind, maxd );
     int room_height = Util.randint( mind, maxd );
     int[] coordinates = getClosestUnoccupiedSpace( map, x, y, room_width+2, room_height+2 );
     digOutArea(map, coordinates[0], coordinates[1], room_width, room_height);
+    return (coordinates==null) ? false : true;
   }
 
   private int[] getClosestUnoccupiedSpace( int[][] map, int x, int y, int width, int height ) {
