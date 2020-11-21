@@ -99,10 +99,7 @@ public class GUI extends JFrame {
           errMsg.setText("Error:"+ex);
           System.out.println(ex);
         }
-//        controlPanel.doLayout();
-//        this.doLayout();
         screen.repaint();
-//        screen.doLayout();
       }
     });
     btnExport = new Button("Export");

@@ -2,7 +2,6 @@ package PCG;
 
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 public class Tunneller implements Generator {
   private int border_left;
@@ -29,6 +28,7 @@ public class Tunneller implements Generator {
     int primeCorrCount   = Integer.parseInt(config[8]);
     int secCorrLenMax   = Integer.parseInt(config[9]);
     int secCorrLenMin   = Integer.parseInt(config[10]);
+    int roomSparsity   = Integer.parseInt(config[11]);
     // initialize map with bigger size so that it can feet the map while placing corridors and rooms
     int[][] map = new int[primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2][primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2];
     rnd = new Random();
@@ -36,15 +36,15 @@ public class Tunneller implements Generator {
     int[] tunnelerLocation = { map.length/2, map.length/2 };
     // will be used to specify the direction of the tunneling
     int tunnelerDirection = Util.randint(1, 4);
-    checkpoints = new HashSet<int[]>();
+    checkpoints = new HashSet<int[]>(100);
     checkpoints.add( tunnelerLocation );
     digMainCorridors(map,
       primeCorrLenMax, primeCorrLenMin,
       primeCorrWidth,   primeCorrCount,
       primeCorrDistMax, primeCorrDistMin,
       primeCorrBranchProb, tunnelerLocation,
-      tunnelerDirection);
-    Util.sop("Generated primary tunnels");
+      tunnelerDirection, roomSparsity);
+    digRooms(map, roomDimMax, roomDimMin);
 
     findBorders(map);
     // trim unused parts of the map
@@ -84,6 +84,8 @@ public class Tunneller implements Generator {
         "Length of the corridor"},
       {"secondary corridors length min", "90",
         "Length of the corridor"},
+      {"room sparsity", "5",
+        "Place rooms every X steps along main corridors"},
     };
   }
 
@@ -96,9 +98,10 @@ public class Tunneller implements Generator {
                                  int travelDistMin,
                                  float branchProb,
                                  int[] tunnelerLocation,
-                                 int direction) throws Exception {
+                                 int direction,
+                                 int roomSparsity) throws Exception {
     Util.sop("Digging prime corridor at " + tunnelerLocation);
-    if ( isOccupied( map, tunnelerLocation[0], tunnelerLocation[1], width ) )
+    if ( isUnoccupied( map, tunnelerLocation[0], tunnelerLocation[1], width, width ) )
       tunnelerLocation = getUnocupiedWithin( map,
         tunnelerLocation[0], tunnelerLocation[1], 100, width );
       // too crowded, can't find any place to put a new corridor start
@@ -116,22 +119,28 @@ public class Tunneller implements Generator {
     // make count number of corridors of length maxDist
     for ( int _=0; _<count; _++ ) {
       int dist = 0;
+      int roomCheckPointCount = 0;
       while ( dist < maxDist  ) {
         int travelDist = Util.randint(travelDistMin, travelDistMax);
         for (int step = 0; step < travelDist; step++) {
           // advance one block ahead
           if (tunnelerLocation == null)
             return;
-          digOutArea(map, tunnelerLocation[0], tunnelerLocation[1], width);
+          if ( roomCheckPointCount > roomSparsity ) {
+            checkpoints.add( new int[]{tunnelerLocation[0], tunnelerLocation[1] } );
+            roomCheckPointCount = 0;
+          }
+          digOutArea(map, tunnelerLocation[0], tunnelerLocation[1], width, width);
           tunnelerLocation[0] += digDirectionSteps[direction - 1][0];
           tunnelerLocation[1] += digDirectionSteps[direction - 1][1];
           dist += 1;
+          roomCheckPointCount += 1;
         }
-        checkpoints.add( tunnelerLocation );
+        checkpoints.add( new int[]{tunnelerLocation[0], tunnelerLocation[1]} );
         int newDirection = getNewDirection(direction);
         // create a branch that goes in a different direction with this one.
         // Split remaining distance between this one and new one
-        if (rnd.nextFloat() < branchProb) {
+        if (rnd.nextFloat() < branchProb && dist<maxDist) {
           int branchDirection = getNewDirection(direction);
           // re-roll the dice if it is equal to the current new direction of the corridor
           while (branchDirection == newDirection)
@@ -139,8 +148,8 @@ public class Tunneller implements Generator {
           int distanceLeft = maxDist - dist;
           maxDist = maxDist - distanceLeft / 2;
           int[] branchLocation = {
-            tunnelerLocation[0] + digDirectionSteps[branchDirection][0],
-            tunnelerLocation[1] + digDirectionSteps[branchDirection][1]
+            tunnelerLocation[0] + digDirectionSteps[branchDirection-1][0],
+            tunnelerLocation[1] + digDirectionSteps[branchDirection-1][1]
           };
           digMainCorridors(map,
             distanceLeft / 2,
@@ -151,7 +160,8 @@ public class Tunneller implements Generator {
             travelDistMin,
             branchProb,
             branchLocation,
-            branchDirection);
+            branchDirection,
+            roomSparsity);
         }
         direction = newDirection;
       }
@@ -162,11 +172,41 @@ public class Tunneller implements Generator {
     }
   }
 
+  private void digRooms( int[][] map, int maxDims, int minDims ) {
+    Util.sop("Generating rooms");
+    for ( int[] chckp : checkpoints ) {
+      generateRoom( map, chckp[0], chckp[1], maxDims, minDims );
+    }
+  }
+
+  //
+  private void generateRoom( int[][] map, int x, int y, int maxd, int mind ) {
+    int room_width  = Util.randint( mind, maxd );
+    int room_height = Util.randint( mind, maxd );
+    int[] coordinates = getClosestUnoccupiedSpace( map, x, y, room_width+2, room_height+2 );
+    digOutArea(map, coordinates[0], coordinates[1], room_width, room_height);
+  }
+
+  private int[] getClosestUnoccupiedSpace( int[][] map, int x, int y, int width, int height ) {
+    int[] result = null;
+    int bestDist = 1000;
+    for ( int sy=-height*2; sy < height*2; sy++ ) {
+      for ( int sx=-width*2; sx < width*2; sx++ ) {
+        if ( isUnoccupied( map, x+sx, y+sy, width, height )
+           && (int)Math.sqrt( Math.pow(sx, 2) + Math.pow(sy, 2) ) < bestDist ) {
+          bestDist = (int)Math.sqrt( Math.pow(sx, 2) + Math.pow(sy, 2) );
+          result = new int[]{ x+sx, y+sy };
+        }
+      }
+    }
+    return result;
+  }
+
   private int[] getUnocupiedWithin(int[][] map, int x, int y, int searchRadius, int requiredSpace) {
     int checkX = x;
     int checkY = y;
     for (int tries=0; tries<1000; tries++) {
-      if ( isOccupied(map, checkX, checkY, requiredSpace) ) {
+      if ( isUnoccupied(map, checkX, checkY, requiredSpace, requiredSpace) ) {
         return new int[] { checkX, checkY };
       }
       checkX = Util.randint( x-searchRadius, x+searchRadius );
@@ -175,13 +215,15 @@ public class Tunneller implements Generator {
     return null;
   }
 
-  private boolean isOccupied(int[][] map, int x, int y, int requiredSpace ) {
+  private boolean isUnoccupied(int[][] map, int x, int y, int width, int height ) {
     boolean valid = true;
-    int idxXStart = x - requiredSpace/2;
-    int idxYStart = y - requiredSpace/2;
-    for ( int yCheck=0; yCheck<requiredSpace; yCheck++ ) {
-      for ( int xCheck=0; xCheck<requiredSpace; xCheck++ ) {
-        if ( map[ idxYStart+yCheck ][ idxXStart+xCheck ]!=0 ) {
+    int xStart = x - (int)Math.floor((double) width/2);
+    int xEnd   = x + (int)Math.ceil ((double) width/2);
+    int yStart = y - (int)Math.floor((double) height/2);
+    int yEnd   = y + (int)Math.ceil ((double) height/2);
+    for ( int yCheck=yStart; yCheck<yEnd; yCheck++ ) {
+      for ( int xCheck=xStart; xCheck<xEnd; xCheck++ ) {
+        if ( map[ yCheck ][ xCheck ]!=0 ) {
           valid = false;
         }
       }
@@ -189,11 +231,11 @@ public class Tunneller implements Generator {
     return valid;
   }
 
-  private void digOutArea( int[][] map, int x, int y, int diameter ) {
-    int xStart = x - (int)Math.floor((double) diameter/2);
-    int xEnd   = x + (int)Math.ceil ((double) diameter/2);
-    int yStart = y - (int)Math.floor((double) diameter/2);
-    int yEnd   = y + (int)Math.ceil ((double) diameter/2);
+  private void digOutArea( int[][] map, int x, int y, int width, int height ) {
+    int xStart = x - (int)Math.floor((double) width/2);
+    int xEnd   = x + (int)Math.ceil ((double) width/2);
+    int yStart = y - (int)Math.floor((double) height/2);
+    int yEnd   = y + (int)Math.ceil ((double) height/2);
     for ( int idxY = yStart; idxY < yEnd; idxY++ ) {
       for ( int idxX = xStart; idxX < xEnd; idxX++ ) {
         map[ idxY ][ idxX ] = 1;
