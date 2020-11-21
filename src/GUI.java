@@ -1,3 +1,5 @@
+import PCG.Util;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -76,6 +78,12 @@ public class GUI extends JFrame {
       algorithms.addItem(algorithmID);
     }
     algorithms.setFont(new Font("Arial", Font.PLAIN, 15));
+    algorithms.addItemListener(new ItemListener() {
+      @Override
+      public void itemStateChanged(ItemEvent e) {
+        resetControlPanelTo(e.getItem().toString());
+      }
+    });
 
     JLabel errMsg = new JLabel();
     errMsg.setText("");
@@ -134,7 +142,7 @@ public class GUI extends JFrame {
     controlPanel.add(algorithms);
     controlPanel.add(algorithmsLabel);
     mainComponentsNumber = controlPanel.getComponentCount();
-    resetControlPanelTo("BSP");
+//    resetControlPanelTo("BSP");
     updateSavedList();
     gbc.gridx = 0;
     gbc.gridy = 0;
@@ -153,10 +161,15 @@ public class GUI extends JFrame {
   }
 
   private void resetControlPanelTo(String algorithm ) {
-    String[][] configs = mapGen.getDefaultConfig();
+    String[][] configs = mapGen.switchTo( algorithm );
     // remove all algorithm specific configuration fields
-    for (int idx=mainComponentsNumber; idx<controlPanel.getComponentCount(); idx++) {
-      controlPanel.remove(idx);
+    if ( controlPanel.getComponentCount() >= mainComponentsNumber ) {
+      int toRemove = controlPanel.getComponentCount() - mainComponentsNumber;
+      for (int idx=0; idx<toRemove; idx++) {
+        controlPanel.remove(mainComponentsNumber);
+      }
+      controlPanel.doLayout();
+      this.doLayout();
     }
     for ( String[] config: configs ) {
       JLabel     lable = new JLabel(config[0]);
@@ -168,6 +181,8 @@ public class GUI extends JFrame {
       controlPanel.add(field);
       controlPanel.add(lable);
     }
+    controlPanel.doLayout();
+    this.doLayout();
   }
 
   private void loadConfigurations() {

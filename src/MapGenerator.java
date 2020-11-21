@@ -63,6 +63,19 @@ public class MapGenerator<FileInputStreamStream> {
     return configAlgorithm;
   }
 
+  public String[][] switchTo( String algorithm ) {
+    if ( algorithm.equals(configAlgorithm) )
+      return getConfigPhony();
+    configAlgorithm = algorithm;
+    String[][] strConfigs = getDefaultConfig();
+    config = new String[ strConfigs.length ];
+    for ( int idx=0; idx< strConfigs.length; idx++ ) {
+      config[idx] = strConfigs[idx][1];
+    }
+    error = "        ";
+    return strConfigs;
+  }
+
   public String[][] getDefaultConfig() {
     assert strToAlgorithm.containsKey(configAlgorithm) : "No algorithm";
     Generator g = strToAlgorithm.get(configAlgorithm);
@@ -71,6 +84,15 @@ public class MapGenerator<FileInputStreamStream> {
 
   public String[] getConfig() {
     return config;
+  }
+
+  public String[][] getConfigPhony() {
+    String[] configs = getConfig();
+    String[][] configsph = getDefaultConfig();
+    for ( int idx=0;idx< configs.length; idx++ ) {
+      configsph[idx][1] = configs[idx];
+    }
+    return configsph;
   }
 
   public String[] getAlgorithms(){
