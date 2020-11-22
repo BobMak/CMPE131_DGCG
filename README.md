@@ -4,6 +4,7 @@ A set of implementations for common 2d dungeon map generators and a visualizatio
 
 Currently implemented PCG algorithms:
 * Binary Space Partitioning
+* Tunnelling
 
 ### Screenshots
 
