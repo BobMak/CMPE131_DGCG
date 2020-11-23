@@ -4,12 +4,6 @@ import java.util.HashSet;
 import java.util.Random;
 
 public class Tunneller implements Generator {
-  private int border_left;
-  private int border_right;
-  private int border_top;
-  private int border_bottom;
-
-  //
   private HashSet<int[]> checkpoints;
   private int[][] rooms;
 
@@ -25,8 +19,8 @@ public class Tunneller implements Generator {
     int primeCorrDistMax = Integer.parseInt(config[5]);
     int primeCorrDistMin = Integer.parseInt(config[6]);
     float primeCorrBranchProb = Float.parseFloat(config[7]);
-    int primeCorrCount   = Integer.parseInt(config[8]);
-    int secCorrCount   = Integer.parseInt(config[9]);
+    int primeCorrCount  = Integer.parseInt(config[8]);
+    int secCorrCount    = Integer.parseInt(config[9]);
     int secCorrLenMax   = Integer.parseInt(config[10]);
     int secCorrLenMin   = Integer.parseInt(config[11]);
     int loopsCount      = Integer.parseInt(config[12]);
@@ -55,15 +49,20 @@ public class Tunneller implements Generator {
       roomSparsity, loopsCount);
     // places rooms in closest unoccupied area around every checkpoint
     digRooms(map, roomDimMax, roomDimMin);
-
-    findBorders(map);
     // trim unused parts of the map
+    return trimUnused(map);
+  }
+
+  private int[][] trimUnused(int[][] map) {
+    int[] borders = findBorders(map);
+    int border_left  = borders[0];
+    int border_right = borders[1];
+    int border_top = borders[2];
+    int border_bottom = borders[3];
     int[][] trimmedMap = new int[border_top - border_bottom+4][border_right - border_left+4];
-    for ( int y=border_bottom-1; y<border_top+2; y++ ) {
-      for ( int x=border_left-1; x<border_right+2; x++ ) {
+    for ( int y=border_bottom-1; y<border_top+2; y++ )
+      for ( int x=border_left-1; x<border_right+2; x++ )
         trimmedMap[y-border_bottom+1][x-border_left+1] = map[y][x];
-      }
-    }
     return trimmedMap;
   }
 
@@ -113,7 +112,7 @@ public class Tunneller implements Generator {
                                  int direction,
                                  int roomSparsity) throws Exception {
     Util.sop("Digging prime corridor at " + tunnelerLocation.toString());
-    if ( isUnoccupied( map, tunnelerLocation[0], tunnelerLocation[1], width, width ) )
+    if ( !isUnoccupied( map, tunnelerLocation[0], tunnelerLocation[1], width, width ) )
       tunnelerLocation = getUnocupiedWithin( map,
         tunnelerLocation[0], tunnelerLocation[1], 100, width );
       // too crowded, can't find any place to put a new corridor start
@@ -194,22 +193,33 @@ public class Tunneller implements Generator {
 
   }
 
-  private void digRooms( int[][] map, int maxDims, int minDims ) {
+  // draw a horizontal and vertical corridor
+  // will pierce through any rooms and corridors on the way
+  private void connect(int[][] map, int[] loc1, int[] loc2) throws Exception {
+    // dig out vertical corridor
+    digOutAreaFromTo(map, loc1[0], loc1[1], 1, loc2[1] - loc1[1]);
+    // dig out horizontal
+    digOutAreaFromTo(map, loc1[0], loc2[1], loc2[0] - loc1[0], 1);
+  }
+
+  private void digRooms( int[][] map, int maxDims, int minDims ) throws Exception {
     Util.sop("Generating rooms around " + checkpoints.size()+ " checkpoints");
     // count successfully generated rooms;
     int _count = 0;
     for ( int[] chckp : checkpoints ) {
-      _count += generateRoom( map, chckp[0], chckp[1], maxDims, minDims ) ? 1 : 0;
+      int[] roomxy = generateRoom( map, chckp[0], chckp[1], maxDims, minDims );
+      _count += (roomxy==null) ? 0 : 1;
+      connect( map, chckp, roomxy );
     }
     Util.sop("Generated " + _count + " rooms");
   }
 
-  private boolean generateRoom( int[][] map, int x, int y, int maxd, int mind ) {
+  private int[] generateRoom( int[][] map, int x, int y, int maxd, int mind ) throws Exception {
     int room_width  = Util.randint( mind, maxd );
     int room_height = Util.randint( mind, maxd );
     int[] coordinates = getClosestUnoccupiedSpace( map, x, y, room_width+2, room_height+2 );
     digOutArea(map, coordinates[0], coordinates[1], room_width, room_height);
-    return (coordinates==null) ? false : true;
+    return coordinates;
   }
 
   private int[] getClosestUnoccupiedSpace( int[][] map, int x, int y, int width, int height ) {
@@ -246,26 +256,33 @@ public class Tunneller implements Generator {
     int xEnd   = x + (int)Math.ceil ((double) width/2);
     int yStart = y - (int)Math.floor((double) height/2);
     int yEnd   = y + (int)Math.ceil ((double) height/2);
-    for ( int yCheck=yStart; yCheck<yEnd; yCheck++ ) {
-      for ( int xCheck=xStart; xCheck<xEnd; xCheck++ ) {
-        if ( map[ yCheck ][ xCheck ]!=0 ) {
+    for ( int yCheck=yStart; yCheck<yEnd; yCheck++ )
+      for ( int xCheck=xStart; xCheck<xEnd; xCheck++ )
+        if ( map[ yCheck ][ xCheck ]!=0 )
           valid = false;
-        }
-      }
-    }
     return valid;
   }
 
-  private void digOutArea( int[][] map, int x, int y, int width, int height ) {
+  // dig our area with width and height around x,y
+  private void digOutArea( int[][] map, int x, int y, int width, int height ) throws Exception {
+    if ( width < 0 || height < 0 )
+      throw new Exception("tried to dig out area with width=" + width + " and heihgt=" + height);
     int xStart = x - (int)Math.floor((double) width/2);
     int xEnd   = x + (int)Math.ceil ((double) width/2);
     int yStart = y - (int)Math.floor((double) height/2);
     int yEnd   = y + (int)Math.ceil ((double) height/2);
-    for ( int idxY = yStart; idxY < yEnd; idxY++ ) {
-      for ( int idxX = xStart; idxX < xEnd; idxX++ ) {
+    for ( int idxY = yStart; idxY < yEnd; idxY++ )
+      for ( int idxX = xStart; idxX < xEnd; idxX++ )
         map[ idxY ][ idxX ] = 1;
-      }
-    }
+  }
+
+  // dig out area from x,y to x+w,y+h
+  private void digOutAreaFromTo( int[][] map, int x, int y, int width, int height ) {
+    int incrementX = (int)Math.signum(width);
+    int incrementY = (int)Math.signum(height);
+    for ( int idxY = y; idxY != y+height; idxY+=incrementY )
+      for ( int idxX = x; idxX != x+width; idxX+=incrementX )
+        map[ idxY ][ idxX ] = 1;
   }
 
   private int getNewDirection(int direction) throws Exception {
@@ -284,11 +301,11 @@ public class Tunneller implements Generator {
     return i;
   }
 
-  private void findBorders( int[][] map ) {
-    border_left  = map[0].length;
-    border_right = 0;
-    border_top   = 0;
-    border_bottom= map.length;
+  private int[] findBorders( int[][] map ) {
+    int border_left  = map[0].length;
+    int border_right = 0;
+    int border_top   = 0;
+    int border_bottom= map.length;
     for ( int idx_y=0; idx_y<map.length; idx_y++ )
       for ( int idx_x=0; idx_x< map[0].length; idx_x++ )
         if ( map[idx_y][idx_x] != 0 )
@@ -317,6 +334,6 @@ public class Tunneller implements Generator {
             border_top = idx_y;
             break;
           }
-
+    return new int[] { border_left, border_right, border_top, border_bottom };
   }
 }
