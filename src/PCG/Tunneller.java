@@ -151,7 +151,7 @@ public class Tunneller implements Generator {
         int newDirection = getNewDirection(direction);
         // create a branch that goes in a different direction with this one.
         // Split remaining distance between this one and new one
-        if (rnd.nextFloat() < branchProb && dist<maxDist) {
+        if (rnd.nextFloat() < branchProb && dist < maxDist) {
           int branchDirection = getNewDirection(direction);
           // re-roll the dice if it is equal to the current new direction of the corridor
           while (branchDirection == newDirection)
@@ -159,8 +159,8 @@ public class Tunneller implements Generator {
           int distanceLeft = maxDist - dist;
           maxDist = maxDist - distanceLeft / 2;
           int[] branchLocation = {
-            tunnelerLocation[0] + digDirectionSteps[branchDirection-1][0],
-            tunnelerLocation[1] + digDirectionSteps[branchDirection-1][1]
+            tunnelerLocation[0] + digDirectionSteps[branchDirection-1][0]*width,
+            tunnelerLocation[1] + digDirectionSteps[branchDirection-1][1]*width
           };
           digPrimeCorridors(map,
             distanceLeft / 2,
