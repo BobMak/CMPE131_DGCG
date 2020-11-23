@@ -116,9 +116,8 @@ public class Tunneller implements Generator {
       tunnelerLocation = getUnocupiedWithin( map,
         tunnelerLocation[0], tunnelerLocation[1], 100, width );
       // too crowded, can't find any place to put a new corridor start
-      if ( tunnelerLocation==null ) {
+      if ( tunnelerLocation==null )
         Util.sop("[WARNIGN] filed to find a starting area for a primary corridor");
-      }
     int maxDist = Util.randint(distMin, distMax) / count;
     // 1 - north, 2 - east, 3 - south, 4 - west
     int [][] digDirectionSteps = {
@@ -127,7 +126,7 @@ public class Tunneller implements Generator {
       {0, -1},
       {-1, 0},
     };
-    // make count number of corridors of length maxDist
+    // make a count number of corridors of length maxDist
     for ( int _=0; _<count; _++ ) {
       int dist = 0;
       int roomCheckPointCount = 0;
@@ -179,7 +178,7 @@ public class Tunneller implements Generator {
       int[][] chps = checkpoints.toArray(new int[0][]);
       int idx = rnd.nextInt(chps.length);
       int[] newDigPoint = chps[idx];
-      tunnelerLocation = getUnocupiedWithin(map, newDigPoint[0], newDigPoint[1], 60, width);
+      tunnelerLocation = getClosestUnoccupiedSpace(map, newDigPoint[0], newDigPoint[1], width+10, width+10);
     }
   }
 
@@ -225,15 +224,13 @@ public class Tunneller implements Generator {
   private int[] getClosestUnoccupiedSpace( int[][] map, int x, int y, int width, int height ) {
     int[] result = null;
     int bestDist = 1000;
-    for ( int sy=-height*2; sy < height*2; sy++ ) {
-      for ( int sx=-width*2; sx < width*2; sx++ ) {
+    for ( int sy=-height*2; sy < height*2; sy++ )
+      for ( int sx=-width*2; sx < width*2; sx++ )
         if ( isUnoccupied( map, x+sx, y+sy, width, height )
            && (int)Math.sqrt( Math.pow(sx, 2) + Math.pow(sy, 2) ) < bestDist ) {
           bestDist = (int)Math.sqrt( Math.pow(sx, 2) + Math.pow(sy, 2) );
           result = new int[]{ x+sx, y+sy };
         }
-      }
-    }
     return result;
   }
 
