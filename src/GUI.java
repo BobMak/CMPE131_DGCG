@@ -98,7 +98,6 @@ public class GUI extends JFrame {
       public void actionPerformed(ActionEvent e){
         try {
           btnExport.setEnabled(true);
-          mapGen.setConfigAlgorithm(algorithms.getItem(algorithms.getSelectedIndex()));
           String[] configs = getConfigs();
           mapGen.setConfig(configs);
           screen.setMap( mapGen.generate() );
@@ -127,8 +126,11 @@ public class GUI extends JFrame {
       public void actionPerformed(ActionEvent e){
         String filename = savedMapsList.getSelectedItem();
         mapGen.importFile(filename);
-//        resetControlPanelTo( "BSP" );
+        resetControlPanelTo( mapGen.getConfigAlgorithm() );
+        algorithms.select( mapGen.getConfigAlgorithm() );
+
         loadConfigurations();
+        screen.setMap( mapGen.getMap() );
         screen.repaint();
       }
     });
