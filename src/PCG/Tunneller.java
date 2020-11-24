@@ -233,6 +233,7 @@ public class Tunneller implements Generator {
     return result;
   }
 
+  // returns a random unoccupied area within the search radius
   private int[] getUnocupiedWithin(int[][] map, int x, int y, int searchRadius, int requiredSpace) {
     int checkX = x;
     int checkY = y;
