@@ -113,11 +113,7 @@ public class Tunneller implements Generator {
                                  int roomSparsity) throws Exception {
     Util.sop("Digging prime corridor at " + tunnelerLocation.toString());
     if ( !isUnoccupied( map, tunnelerLocation[0], tunnelerLocation[1], width, width ) )
-      tunnelerLocation = getUnocupiedWithin( map,
-        tunnelerLocation[0], tunnelerLocation[1], 100, width );
-      // too crowded, can't find any place to put a new corridor start
-      if ( tunnelerLocation==null )
-        Util.sop("[WARNIGN] filed to find a starting area for a primary corridor");
+      Util.sop("[WARNIGN] starting a primary corridor on top of the previous one");
     int maxDist = Util.randint(distMin, distMax) / count;
     // 1 - north, 2 - east, 3 - south, 4 - west
     int [][] digDirectionSteps = {
@@ -207,8 +203,10 @@ public class Tunneller implements Generator {
     int _count = 0;
     for ( int[] chckp : checkpoints ) {
       int[] roomxy = generateRoom( map, chckp[0], chckp[1], maxDims, minDims );
-      _count += (roomxy==null) ? 0 : 1;
-      connect( map, chckp, roomxy );
+      if (roomxy!=null) {
+        _count++;
+        connect( map, chckp, roomxy );
+      }
     }
     Util.sop("Generated " + _count + " rooms");
   }
@@ -217,7 +215,8 @@ public class Tunneller implements Generator {
     int room_width  = Util.randint( mind, maxd );
     int room_height = Util.randint( mind, maxd );
     int[] coordinates = getClosestUnoccupiedSpace( map, x, y, room_width+2, room_height+2 );
-    digOutArea(map, coordinates[0], coordinates[1], room_width, room_height);
+    if ( coordinates != null )
+      digOutArea(map, coordinates[0], coordinates[1], room_width, room_height);
     return coordinates;
   }
 
