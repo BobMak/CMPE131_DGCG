@@ -80,10 +80,4 @@ class MapTest {
 	void addForOnly (Coordinates coor) {
 		if (!theOnly.contains(coor)) theOnly.add(coor);
 	}
-	
-	@Test
-	void testExport() {
-		System.out.println("");
-	}
-
 }
