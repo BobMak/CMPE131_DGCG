@@ -1,4 +1,3 @@
-package PCG;
 
 public class Coordinates {
 
@@ -8,6 +7,14 @@ public class Coordinates {
 	public Coordinates (int x, int y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
 	}
 	
 	@Override
@@ -21,6 +28,6 @@ public class Coordinates {
 	
 	@Override
 	public int hashCode () {
-		return (" " + x + y).hashCode();
+		return x*31 + y;
 	}
 }

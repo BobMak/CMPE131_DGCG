@@ -58,7 +58,7 @@ public class Screen extends JPanel implements ActionListener {
     float tileSize = Math.min(
       (float) currentDisplayHeight/map.length,
       (float) currentDisplayWidth/map[0].length );
-    g2d.setFont(new Font("Press Start 2P", Font.PLAIN, (int)tileSize));
+    g2d.setFont(new Font("DialogInput", Font.PLAIN, (int)tileSize));
     for (int y=0; y< map.length ; y++) {
       for (int x=0; x<map[0].length ; x++) {
         if ( ASCIIMode)

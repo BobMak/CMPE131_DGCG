@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class MapGenerator<FileInputStreamStream> {
   private int[][] map;
   private HashMap<String, Generator> strToAlgorithm = new HashMap<String, Generator>(){{
-    put("Tunneler", new Tunneller());
+    put("Tunneller", new Tunneller());
     put("BSP", new BSP());
   }};
   private String configAlgorithm;
@@ -15,7 +15,7 @@ public class MapGenerator<FileInputStreamStream> {
   private String error;
   // Default config
   MapGenerator() {
-    configAlgorithm = "Tunneler";
+    configAlgorithm = "Tunneller";
     String[][] strConfigs = getDefaultConfig();
     config = new String[ strConfigs.length ];
     for ( int idx=0; idx< strConfigs.length; idx++ ) {

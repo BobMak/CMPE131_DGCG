@@ -5,6 +5,7 @@ import java.util.Random;
 
 public class Tunneller implements Generator {
   private HashSet<int[]> checkpoints;
+  private HashSet<int[]> primeCheckpoints;
   private int[][] rooms;
 
   private Random rnd;
@@ -26,7 +27,7 @@ public class Tunneller implements Generator {
     int loopsCount      = Integer.parseInt(config[12]);
     int roomSparsity    = Integer.parseInt(config[13]);
     // initialize map with bigger size so that it can feet the map while placing corridors and rooms
-    int[][] map = new int[primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2][primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2];
+    int[][] map = new int[primeCorrLenMax*2*primeCorrCount + secCorrLenMax*2 + roomDimMax*2][primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2];
     rnd = new Random();
     // the starting point is always in the center
     int[] tunnelerLocation = { map.length/2, map.length/2 };
@@ -111,7 +112,15 @@ public class Tunneller implements Generator {
                                  int[] tunnelerLocation,
                                  int direction,
                                  int roomSparsity) throws Exception {
-    Util.sop("Digging prime corridor at " + tunnelerLocation.toString());
+    if ( distMin > distMax )
+      throw new Exception("Max corridor length < Min corridor length");
+    if ( travelDistMin > travelDistMax )
+      throw new Exception("Max travel distance < Min travel distance");
+    if ( travelDistMax > distMin )
+      throw new Exception("Max travel distance > Min corridor length");
+    if ( distMin < 1 )
+      throw new Exception("travel distance less then zero");
+    Util.sop("Digging prime corridor at [" + tunnelerLocation[0]+"]["+tunnelerLocation[0]+"]");
     if ( !isUnoccupied( map, tunnelerLocation[0], tunnelerLocation[1], width, width ) )
       Util.sop("[WARNIGN] starting a primary corridor on top of the previous one");
     int maxDist = Util.randint(distMin, distMax) / count;
@@ -158,8 +167,8 @@ public class Tunneller implements Generator {
             tunnelerLocation[1] + digDirectionSteps[branchDirection-1][1]*width
           };
           digPrimeCorridors(map,
-            distanceLeft / 2,
-            distanceLeft / 2 - 1,
+            Math.min(distanceLeft / 2, 1) ,
+            Math.min(distanceLeft / 2, 1) ,
             width,
             1,
             travelDistMax,
@@ -171,6 +180,8 @@ public class Tunneller implements Generator {
         }
         direction = newDirection;
       }
+      primeCheckpoints.add(tunnelerLocation);
+      // Get next location for a corridor
       int[][] chps = checkpoints.toArray(new int[0][]);
       int idx = rnd.nextInt(chps.length);
       int[] newDigPoint = chps[idx];
@@ -184,8 +195,12 @@ public class Tunneller implements Generator {
                                      int secCorrCount,
                                      int roomSparsity,
                                      int[] tunnelerLocation,
-                                     int tunnelerDirection, int roomSparsity1, int loopsCount) {
-
+                                     int tunnelerDirection, int roomSparsity1, int loopsCount) throws Exception {
+    int[][] locations = primeCheckpoints.toArray(new int[0][]);
+    for ( int[] loc: locations ) {
+      int[] anotherLoc = locations[rnd.nextInt(locations.length)];
+      connect(map, loc, anotherLoc);
+    }
   }
 
   // draw a horizontal and vertical corridor
@@ -237,7 +252,7 @@ public class Tunneller implements Generator {
   private int[] getUnocupiedWithin(int[][] map, int x, int y, int searchRadius, int requiredSpace) {
     int checkX = x;
     int checkY = y;
-    for (int tries=0; tries<1000; tries++) {
+    for (int tries=0; tries<100; tries++) {
       if ( isUnoccupied(map, checkX, checkY, requiredSpace, requiredSpace) ) {
         return new int[] { checkX, checkY };
       }
