@@ -7,26 +7,35 @@ import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 public class Screen extends JPanel implements ActionListener {
-
-  private boolean showGrid;
+  private boolean ASCIIMode;
   public boolean quit;
 
   private final int[][] tiles = {
-          {10,10,10}, {100,100,100}, {10,10,180},
+    {100,100,100}, {10,10,10}, {10,10,180},
+  };
+
+  private final int[][] tilesASCIIColor = {
+    {120,120,50}, {100,100,100}, {10,10,180},
+  };
+
+  private final String[] tilesASCII = {
+    "#", "."
   };
 
   private int[][] map;
 
   public Screen() {
+    ASCIIMode = false;
     quit = false;
+
     addKeyListener(new TAdapter());
     setBackground(Color.BLACK);
     setFocusable(true);
     map = new int[][]{{0,0},{0,0}};
   }
 
-  public void toggleGrid() {
-    showGrid = !showGrid;
+  public void toggleASCII() {
+    ASCIIMode = !ASCIIMode;
     repaint();
   }
 
@@ -49,16 +58,28 @@ public class Screen extends JPanel implements ActionListener {
     float tileSize = Math.min(
       (float) currentDisplayHeight/map.length,
       (float) currentDisplayWidth/map[0].length );
+    g2d.setFont(new Font("Press Start 2P", Font.PLAIN, (int)tileSize));
     for (int y=0; y< map.length ; y++) {
       for (int x=0; x<map[0].length ; x++) {
-        clr = tiles[map[y][x]];
+        if ( ASCIIMode)
+          clr = tilesASCIIColor[map[y][x]];
+        else
+          clr = tiles[map[y][x]];
         g2d.setColor(new Color(clr[0], clr[1], clr[2]));
-        g2d.fillRect(
-          Math.round(x * tileSize),
-          Math.round(y * tileSize),
-          (int)Math.ceil(tileSize),
-          (int)Math.ceil(tileSize));
-        if ( showGrid ) {
+        if ( ASCIIMode ) {
+          g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+          g2d.drawString(tilesASCII[map[y][x]],
+            Math.round(x * tileSize),
+            Math.round(y * tileSize)+tileSize
+          );
+        }
+        else {
+          g2d.fillRect(
+            Math.round(x * tileSize),
+            Math.round(y * tileSize),
+            (int)Math.ceil(tileSize),
+            (int)Math.ceil(tileSize));
           g2d.setColor(new Color(0,0, 0));
           g2d.drawRect(
             Math.round(x * tileSize),

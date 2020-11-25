@@ -1,5 +1,3 @@
-import PCG.Util;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -50,17 +48,17 @@ public class GUI extends JFrame {
     savedMapsList = new List();
     savedMapsList.setFont(new Font("Arial", Font.PLAIN, 15));
 
-    JLabel enableGridLable = new JLabel("Enable Grid");
-    enableGridLable.setFont(new Font("Arial", Font.PLAIN, 15));
-    enableGridLable.setToolTipText("Toggle Grid. Can make , " +
-      "will using algorithm's name, configuration, and current time");
-    Checkbox enableGrid = new Checkbox();
-    enableGrid.addItemListener(new ItemListener(){
+    JLabel enableASCIIlable = new JLabel("ASCII mode");
+    enableASCIIlable.setFont(new Font("Arial", Font.PLAIN, 15));
+    enableASCIIlable.setToolTipText("Toggle ASCII mode");
+    Checkbox enableASCII = new Checkbox();
+    enableASCII.addItemListener(new ItemListener(){
       @Override
       public void itemStateChanged(ItemEvent e) {
-        screen.toggleGrid();
+        screen.toggleASCII();
       }
     });
+
 
     JLabel mapNameLabel = new JLabel("Name");
     mapNameLabel.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -138,8 +136,8 @@ public class GUI extends JFrame {
     controlPanel.add(btnExport);
     controlPanel.add(btnGenerate);
     controlPanel.add(errMsg);
-    controlPanel.add(enableGrid);
-    controlPanel.add(enableGridLable);
+    controlPanel.add(enableASCII);
+    controlPanel.add(enableASCIIlable);
     controlPanel.add(mapName);
     controlPanel.add(mapNameLabel);
     controlPanel.add(algorithms);
