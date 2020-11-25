@@ -27,13 +27,14 @@ public class Tunneller implements Generator {
     int loopsCount      = Integer.parseInt(config[12]);
     int roomSparsity    = Integer.parseInt(config[13]);
     // initialize map with bigger size so that it can feet the map while placing corridors and rooms
-    int[][] map = new int[primeCorrLenMax*2*primeCorrCount + secCorrLenMax*2 + roomDimMax*2][primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2];
+    int[][] map = new int[primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2][primeCorrLenMax*2 + secCorrLenMax*2 + roomDimMax*2];
     rnd = new Random();
     // the starting point is always in the center
     int[] tunnelerLocation = { map.length/2, map.length/2 };
     // will be used to specify the direction of the tunneling
     int tunnelerDirection = Util.randint(1, 4);
     checkpoints = new HashSet<int[]>(100);
+    primeCheckpoints = new HashSet<>();
     checkpoints.add( tunnelerLocation );
     // excavates primary corridors and leaves checkpoints around which rooms are to be placed
     digPrimeCorridors(map,
@@ -60,11 +61,17 @@ public class Tunneller implements Generator {
     int border_right = borders[1];
     int border_top = borders[2];
     int border_bottom = borders[3];
-    int[][] trimmedMap = new int[border_top - border_bottom+4][border_right - border_left+4];
-    for ( int y=border_bottom-1; y<border_top+2; y++ )
-      for ( int x=border_left-1; x<border_right+2; x++ )
-        trimmedMap[y-border_bottom+1][x-border_left+1] = map[y][x];
-    return trimmedMap;
+    try{
+      int[][] trimmedMap = new int[border_top - border_bottom+4][border_right - border_left+4];
+      for ( int y=border_bottom-1; y<border_top+2; y++ )
+        for ( int x=border_left-1; x<border_right+2; x++ )
+          trimmedMap[y-border_bottom+1][x-border_left+1] = map[y][x];
+      return trimmedMap;
+    }
+    catch (Exception e) {
+      Util.sop("[Warning] Failed to trim borders");
+    }
+    return map;
   }
 
   @Override
@@ -116,8 +123,6 @@ public class Tunneller implements Generator {
       throw new Exception("Max corridor length < Min corridor length");
     if ( travelDistMin > travelDistMax )
       throw new Exception("Max travel distance < Min travel distance");
-    if ( travelDistMax > distMin )
-      throw new Exception("Max travel distance > Min corridor length");
     if ( distMin < 1 )
       throw new Exception("travel distance less then zero");
     Util.sop("Digging prime corridor at [" + tunnelerLocation[0]+"]["+tunnelerLocation[0]+"]");
@@ -149,6 +154,8 @@ public class Tunneller implements Generator {
           tunnelerLocation[0] += digDirectionSteps[direction - 1][0];
           tunnelerLocation[1] += digDirectionSteps[direction - 1][1];
           dist += 1;
+          if (dist > maxDist)
+            break;
           roomCheckPointCount += 1;
         }
         checkpoints.add( new int[]{tunnelerLocation[0], tunnelerLocation[1]} );
@@ -268,6 +275,8 @@ public class Tunneller implements Generator {
     int xEnd   = x + (int)Math.ceil ((double) width/2);
     int yStart = y - (int)Math.floor((double) height/2);
     int yEnd   = y + (int)Math.ceil ((double) height/2);
+    if ( xStart < 0 || xEnd >= map[0].length || yStart < 0 || yEnd >= map.length )
+      return false;
     for ( int yCheck=yStart; yCheck<yEnd; yCheck++ )
       for ( int xCheck=xStart; xCheck<xEnd; xCheck++ )
         if ( map[ yCheck ][ xCheck ]!=0 )
@@ -283,6 +292,8 @@ public class Tunneller implements Generator {
     int xEnd   = x + (int)Math.ceil ((double) width/2);
     int yStart = y - (int)Math.floor((double) height/2);
     int yEnd   = y + (int)Math.ceil ((double) height/2);
+    if ( xStart < 0 || xEnd >= map[0].length || yStart < 0 || yEnd >= map.length )
+      return;
     for ( int idxY = yStart; idxY < yEnd; idxY++ )
       for ( int idxX = xStart; idxX < xEnd; idxX++ )
         map[ idxY ][ idxX ] = 1;
