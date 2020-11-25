@@ -1,7 +1,5 @@
 package PCG;
 
-import java.util.HashSet;
-
 public class Coordinates {
 
 	int x;
@@ -25,14 +23,4 @@ public class Coordinates {
 	public int hashCode () {
 		return (" " + x + y).hashCode();
 	}
-	
-	public static void main (String[] args) {
-		Coordinates coor = new Coordinates (0,0);
-		Coordinates coor2 = new Coordinates (0,0);
-		System.out.println(coor.hashCode());
-		HashSet hs = new HashSet();
-		System.out.println(hs.add(coor));
-		System.out.print(hs.add(coor2));
-	}
-	
 }
