@@ -11,15 +11,15 @@ public class Screen extends JPanel implements ActionListener {
   public boolean quit;
 
   private final int[][] tiles = {
-    {100,100,100}, {10,10,10}, {10,10,180},
+    {60,60,60}, {10,10,10}, {100,100,100},
   };
 
   private final int[][] tilesASCIIColor = {
-    {120,120,50}, {100,100,100}, {10,10,180},
+    {60,60,60}, {100,100,100}, {180,180,180},
   };
 
   private final String[] tilesASCII = {
-    "#", "."
+    "#", ".", "#"
   };
 
   private int[][] map;
@@ -59,12 +59,20 @@ public class Screen extends JPanel implements ActionListener {
       (float) currentDisplayHeight/map.length,
       (float) currentDisplayWidth/map[0].length );
     g2d.setFont(new Font("DialogInput", Font.PLAIN, (int)tileSize));
-    for (int y=0; y< map.length ; y++) {
-      for (int x=0; x<map[0].length ; x++) {
+    // Background
+    g2d.setColor(new Color(10, 10, 10));
+    g2d.fillRect(
+      0,
+      0,
+      this.getWidth(),
+      this.getHeight());
+    int[][] pmap = markWalls();
+    for (int y=0; y< pmap.length ; y++) {
+      for (int x=0; x<pmap[0].length ; x++) {
         if ( ASCIIMode)
-          clr = tilesASCIIColor[map[y][x]];
+          clr = tilesASCIIColor[pmap[y][x]];
         else
-          clr = tiles[map[y][x]];
+          clr = tiles[pmap[y][x]];
         g2d.setColor(new Color(clr[0], clr[1], clr[2]));
         if ( ASCIIMode ) {
           g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -89,6 +97,27 @@ public class Screen extends JPanel implements ActionListener {
         }
       }
     }
+  }
+
+  private int[][] markWalls() {
+    int[][] withWalls = new int[map.length][map[0].length];
+    for (int y=0; y< map.length ; y++)
+      for (int x=0; x<map[0].length ; x++) {
+        if ( map[y][x] == 0 && (get2dmax(map, x, y) != 0 ) )
+          withWalls[y][x] = 2;
+        else
+          withWalls[y][x] = map[y][x];
+      }
+    return withWalls;
+  }
+
+  private int get2dmax(int[][] pmap, int px, int py) {
+    int res = 0;
+    for (int y=Math.max(0, py-1); y < Math.min(map.length-1, py+2 ) ; y++)
+      for (int x=Math.max(0, px-1); x < Math.min(map[0].length-1, px+2) ; x++)
+        if ( pmap[y][x] > res )
+          res = pmap[y][x];
+    return res;
   }
 
   @Override
