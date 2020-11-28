@@ -8,14 +8,14 @@ Currently implemented PCG algorithms:
 
 ### Screenshots
 
-![tree0](https://imgur.com/uiAvygT.png)
+![tree0](https://imgur.com/8NvAHqL.png)
 
-![tree1](https://i.imgur.com/IGhbSkR.png)
+![tree1](https://imgur.com/FLU8H9i.png)
 
-![tree2](https://i.imgur.com/H0889Ev.png)
+![tree2](https://imgur.com/OKVDm1m.png)
 
-![tunnel0](https://i.imgur.com/uDZsvTj.png)
+![tunnel0](https://imgur.com/Qfl2CIo.png)
 
-![tunnel1](https://i.imgur.com/8Yr4HRs.png)
+![tunnel1](https://imgur.com/GGNIRoI.png)
 
-![tunnel2](https://i.imgur.com/JRPjYLL.png)
+![tunnelASCII](https://imgur.com/Y8GPwii.png)
