@@ -42,7 +42,8 @@ public class Tunneller implements Generator {
       primeCorrWidth,   primeCorrCount,
       primeCorrDistMax, primeCorrDistMin,
       primeCorrBranchProb, tunnelerLocation,
-      tunnelerDirection, roomSparsity);
+      tunnelerDirection, roomSparsity,
+      false);
     // connects different primary corridors and adds loops
     digSecondaryCorridors(map,
       secCorrLenMax, secCorrLenMin,
@@ -63,8 +64,8 @@ public class Tunneller implements Generator {
     int border_bottom = borders[3];
     try{
       int[][] trimmedMap = new int[border_top - border_bottom+4][border_right - border_left+4];
-      for ( int y=border_bottom-1; y<border_top+2; y++ )
-        for ( int x=border_left-1; x<border_right+2; x++ )
+      for ( int y=Math.max(border_bottom-1, 0); y<Math.min(border_top+2, map.length); y++ )
+        for ( int x = Math.max( border_left-1, 0 ); x < Math.min( border_right+2, map[0].length ); x++ )
           trimmedMap[y-border_bottom+1][x-border_left+1] = map[y][x];
       return trimmedMap;
     }
@@ -118,13 +119,16 @@ public class Tunneller implements Generator {
                                  float branchProb,
                                  int[] tunnelerLocation,
                                  int direction,
-                                 int roomSparsity) throws Exception {
+                                 int roomSparsity,
+                                 boolean branch) throws Exception {
     if ( distMin > distMax )
       throw new Exception("Max corridor length < Min corridor length");
+    if ( travelDistMin < 1 )
+      throw new Exception("Travel distance < 1, can't make progress");
     if ( travelDistMin > travelDistMax )
       throw new Exception("Max travel distance < Min travel distance");
     if ( distMin < 1 )
-      throw new Exception("travel distance less then zero");
+      throw new Exception("travel distance less then 1");
     Util.sop("Digging prime corridor at [" + tunnelerLocation[0]+"]["+tunnelerLocation[0]+"]");
     if ( !isUnoccupied( map, tunnelerLocation[0], tunnelerLocation[1], width, width ) )
       Util.sop("[WARNIGN] starting a primary corridor on top of the previous one");
@@ -137,9 +141,10 @@ public class Tunneller implements Generator {
       {-1, 0},
     };
     // make a count number of corridors of length maxDist
-    for ( int _=0; _<count; _++ ) {
+    for ( int corridor=0; corridor<count; corridor++ ) {
       int dist = 0;
       int roomCheckPointCounter = 0;
+      outer:
       while ( dist < maxDist  ) {
         int travelDist = Util.randint(travelDistMin, travelDistMax);
         for (int step = 0; step < travelDist; step++) {
@@ -154,15 +159,15 @@ public class Tunneller implements Generator {
           tunnelerLocation[0] += digDirectionSteps[direction - 1][0];
           tunnelerLocation[1] += digDirectionSteps[direction - 1][1];
           dist += 1;
-          if ( dist > maxDist )
-            break;
+          if ( dist >= maxDist )
+            break outer;
           roomCheckPointCounter += 1;
         }
-        checkpoints.add( new int[]{tunnelerLocation[0], tunnelerLocation[1]} );
+//        checkpoints.add( new int[]{tunnelerLocation[0], tunnelerLocation[1]} );
         int newDirection = getNewDirection(direction);
         // create a branch that goes in a different direction with this one.
         // Split remaining distance between this one and new one
-        if (rnd.nextFloat() < branchProb && dist < maxDist) {
+        if (rnd.nextFloat() < branchProb && dist < maxDist && maxDist > width) {
           int branchDirection = getNewDirection(direction);
           // re-roll the dice if it is equal to the current new direction of the corridor
           while (branchDirection == newDirection)
@@ -178,16 +183,17 @@ public class Tunneller implements Generator {
             Math.max(distanceLeft / 2, 1) ,
             width,
             1,
-            travelDistMax,
-            travelDistMin,
+            Math.max(travelDistMax, 1),
+            Math.max(travelDistMin, 1),
             branchProb,
             branchLocation,
             branchDirection,
-            roomSparsity);
+            roomSparsity,
+            true);
         }
         direction = newDirection;
       }
-      if ( _ > 0 )
+      if ( !branch )
         primeCheckpoints.add(tunnelerLocation);
       // Get next location for a corridor
       int[][] chps = checkpoints.toArray(new int[0][]);
@@ -209,9 +215,9 @@ public class Tunneller implements Generator {
                                      int[] tunnelerLocation,
                                      int tunnelerDirection, int roomSparsity1, int loopsCount) throws Exception {
     int[][] connectionCheckpoints = primeCheckpoints.toArray(new int[0][]);
-    for ( int[] loc: connectionCheckpoints ) {
-      int[] anotherLoc = connectionCheckpoints[rnd.nextInt(connectionCheckpoints.length)];
-      connect(map, loc, anotherLoc);
+    for ( int i=0; i<connectionCheckpoints.length; i++ ) {
+      int[] anotherLoc = connectionCheckpoints[ (i+1 < connectionCheckpoints.length) ? i+1 : 0 ];
+      connect(map, connectionCheckpoints[i], anotherLoc);
     }
     int[][] loopChekpoints = checkpoints.toArray(new int[0][]);
     for ( int i=0; i<loopsCount; i++ ) {
