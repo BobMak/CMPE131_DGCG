@@ -15,7 +15,7 @@ public class Screen extends JPanel implements ActionListener {
   };
 
   private final int[][] tilesASCIIColor = {
-    {60,60,60}, {100,100,100}, {180,180,180},
+    {60,60,60}, {30,30,30}, {180,180,180},
   };
 
   private final String[] tilesASCII = {

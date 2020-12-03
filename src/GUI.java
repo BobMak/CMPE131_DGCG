@@ -10,6 +10,8 @@ public class GUI extends JFrame {
   List savedMapsList;
   JTextField mapName;
   Button btnExport;
+  GridBagConstraints generalConstrains;
+  GridBagConstraints componentConstrains;
   int mainComponentsNumber;
 
   MapGenerator mapGen;
@@ -23,11 +25,16 @@ public class GUI extends JFrame {
     this.setLayout(gbl);
     screen = new Screen();
     setPreferredSize(getSize());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridx = 1;
-    gbc.gridy = 0;
-    gbc.fill = GridBagConstraints.BOTH;
-    this.add(screen, gbc);
+    generalConstrains   = new GridBagConstraints();
+    componentConstrains = new GridBagConstraints();
+    generalConstrains.gridx = 1;
+    generalConstrains.gridy = 0;
+    generalConstrains.fill = GridBagConstraints.BOTH;
+//    gbc.gridwidth = 6;
+    generalConstrains.weightx = 0.7;
+//    generalConstrains.gridheight = 2;
+    this.add(screen, generalConstrains);
+//    generalConstrains.fill = GridBagConstraints.HORIZONTAL;
 
     mapGen = new MapGenerator();
     // Control JPanel includes:
@@ -36,13 +43,13 @@ public class GUI extends JFrame {
     // Algorithm dropdown
     // dynamic configuration parameters list
     JPanel controlPanelOut = new JPanel();
-    GridLayout glOut = new GridLayout(2,1);
-    glOut.setVgap(10);
+    GridLayout glOut = new GridLayout(2,1);  // 2,1
+//    glOut.setVgap(10);
     controlPanelOut.setLayout(glOut);
     controlPanel = new JPanel();
-    GridLayout gl = new GridLayout(0,2);
-    gl.setHgap(10);
-    glOut.setVgap(10);
+    GridBagLayout gl = new GridBagLayout();  //0,2
+//    gl.setHgap(10);
+//    glOut.setVgap(10);
     controlPanel.setLayout(gl);
 
     savedMapsList = new List();
@@ -132,25 +139,61 @@ public class GUI extends JFrame {
         screen.repaint();
       }
     });
-    controlPanel.add(btnImport);
-    controlPanel.add(btnExport);
-    controlPanel.add(btnGenerate);
-    controlPanel.add(errMsg);
-    controlPanel.add(enableASCII);
-    controlPanel.add(enableASCIIlable);
-    controlPanel.add(mapName);
-    controlPanel.add(mapNameLabel);
-    controlPanel.add(algorithms);
-    controlPanel.add(algorithmsLabel);
+    componentConstrains.gridx = 0;
+    componentConstrains.gridy = 0;
+    componentConstrains.fill = GridBagConstraints.BOTH;
+    componentConstrains.gridheight = 1;
+    componentConstrains.gridwidth = 1;
+    controlPanel.add(btnImport, componentConstrains );
+    componentConstrains .gridx = 1;
+    componentConstrains .gridy = 0;
+    controlPanel.add(btnExport, componentConstrains );
+    componentConstrains.gridx = 0;
+    componentConstrains.gridy = 1;
+    controlPanel.add(btnGenerate, componentConstrains );
+    componentConstrains.gridx = 1;
+    componentConstrains.gridy = 1;
+    controlPanel.add(errMsg, componentConstrains );
+    componentConstrains.gridx = 0;
+    componentConstrains.gridy = 2;
+    controlPanel.add(enableASCII, componentConstrains );
+    componentConstrains.gridx = 1;
+    componentConstrains.gridy = 2;
+    controlPanel.add(enableASCIIlable, componentConstrains );
+    componentConstrains.gridx = 0;
+    componentConstrains.gridy = 3;
+    controlPanel.add(mapName, componentConstrains );
+    componentConstrains.gridx = 1;
+    componentConstrains.gridy = 3;
+    controlPanel.add(mapNameLabel, componentConstrains );
+    componentConstrains.gridx = 0;
+    componentConstrains.gridy = 4;
+    controlPanel.add(algorithms, componentConstrains );
+    componentConstrains.gridx = 1;
+    componentConstrains.gridy = 4;
+    controlPanel.add(algorithmsLabel, componentConstrains );
+    componentConstrains .gridx = 1;
+    componentConstrains .gridy = 5;
     mainComponentsNumber = controlPanel.getComponentCount();
     resetControlPanelTo("BSP");
     updateSavedList();
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    controlPanelOut.add(savedMapsList, gbc);
-    controlPanelOut.add(controlPanel, gbc);
-    this.add(controlPanelOut, gbc);
+    componentConstrains .gridx = 0;
+    componentConstrains .gridy = 0;
+    componentConstrains .gridwidth = 2;
+    componentConstrains.weighty = 0.3;
+    componentConstrains.fill = GridBagConstraints.HORIZONTAL;
+    controlPanelOut.add(savedMapsList, componentConstrains );
+    componentConstrains.fill = GridBagConstraints.BOTH;
+    componentConstrains .gridx = 0;
+    componentConstrains .gridy = 1;
+    componentConstrains .gridwidth = 2;
+    componentConstrains.weighty = 0.7;
+    controlPanelOut.add(controlPanel, componentConstrains );
+    componentConstrains.weighty = 0;
+    generalConstrains.weightx = 0.2;
+    generalConstrains.gridx = 0;
+    generalConstrains.gridy = 0;
+    this.add(controlPanelOut, generalConstrains);
     this.doLayout();
     this.setVisible(true); // set frame visibilty true
     addWindowListener(new WindowAdapter(){
@@ -172,6 +215,7 @@ public class GUI extends JFrame {
       controlPanel.doLayout();
       this.doLayout();
     }
+    int rowIdx = mainComponentsNumber / 2;
     for ( String[] config: configs ) {
       JLabel     lable = new JLabel(config[0]);
       JTextField field = new JTextField(config[1]);
@@ -179,8 +223,16 @@ public class GUI extends JFrame {
       lable.setToolTipText(config[2]);
       field.setFont(new Font("Arial", Font.PLAIN, 15));
       field.setToolTipText(config[2]);
-      controlPanel.add(field);
-      controlPanel.add(lable);
+      generalConstrains.gridx = 0;
+      generalConstrains.gridy = rowIdx;
+      generalConstrains.gridheight = 1;
+      generalConstrains.gridwidth = 1;
+      controlPanel.add(field, generalConstrains);
+      generalConstrains.gridx = 1;
+      generalConstrains.gridy = rowIdx;
+//      gbc.gridwidth = 2;
+      controlPanel.add(lable, generalConstrains);
+      rowIdx++;
     }
     this.doLayout();
     this.setVisible(true); // set frame visibilty true

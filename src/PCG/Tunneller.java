@@ -139,24 +139,24 @@ public class Tunneller implements Generator {
     // make a count number of corridors of length maxDist
     for ( int _=0; _<count; _++ ) {
       int dist = 0;
-      int roomCheckPointCount = 0;
+      int roomCheckPointCounter = 0;
       while ( dist < maxDist  ) {
         int travelDist = Util.randint(travelDistMin, travelDistMax);
         for (int step = 0; step < travelDist; step++) {
           // advance one block ahead
           if (tunnelerLocation == null)
             return;
-          if ( roomCheckPointCount > roomSparsity ) {
+          if ( roomCheckPointCounter > roomSparsity ) {
             checkpoints.add( new int[]{tunnelerLocation[0], tunnelerLocation[1] } );
-            roomCheckPointCount = 0;
+            roomCheckPointCounter = 0;
           }
           digOutArea(map, tunnelerLocation[0], tunnelerLocation[1], width, width);
           tunnelerLocation[0] += digDirectionSteps[direction - 1][0];
           tunnelerLocation[1] += digDirectionSteps[direction - 1][1];
           dist += 1;
-          if (dist > maxDist)
+          if ( dist > maxDist )
             break;
-          roomCheckPointCount += 1;
+          roomCheckPointCounter += 1;
         }
         checkpoints.add( new int[]{tunnelerLocation[0], tunnelerLocation[1]} );
         int newDirection = getNewDirection(direction);
@@ -174,8 +174,8 @@ public class Tunneller implements Generator {
             tunnelerLocation[1] + digDirectionSteps[branchDirection-1][1]*width
           };
           digPrimeCorridors(map,
-            Math.min(distanceLeft / 2, 1) ,
-            Math.min(distanceLeft / 2, 1) ,
+            Math.max(distanceLeft / 2, 1) ,
+            Math.max(distanceLeft / 2, 1) ,
             width,
             1,
             travelDistMax,
@@ -187,12 +187,17 @@ public class Tunneller implements Generator {
         }
         direction = newDirection;
       }
-      primeCheckpoints.add(tunnelerLocation);
+      if ( _ > 0 )
+        primeCheckpoints.add(tunnelerLocation);
       // Get next location for a corridor
       int[][] chps = checkpoints.toArray(new int[0][]);
-      int idx = rnd.nextInt(chps.length);
-      int[] newDigPoint = chps[idx];
-      tunnelerLocation = getClosestUnoccupiedSpace(map, newDigPoint[0], newDigPoint[1], width+10, width+10);
+      for ( int attempt=0; attempt<10; attempt++ ) {
+        int idx = rnd.nextInt(chps.length);
+        int[] newDigPoint = chps[idx];
+        tunnelerLocation = getClosestUnoccupiedSpace(map, newDigPoint[0], newDigPoint[1], width+5, width+5);
+        if ( tunnelerLocation!=null )
+          break;
+      }
     }
   }
 
@@ -203,10 +208,17 @@ public class Tunneller implements Generator {
                                      int roomSparsity,
                                      int[] tunnelerLocation,
                                      int tunnelerDirection, int roomSparsity1, int loopsCount) throws Exception {
-    int[][] locations = primeCheckpoints.toArray(new int[0][]);
-    for ( int[] loc: locations ) {
-      int[] anotherLoc = locations[rnd.nextInt(locations.length)];
+    int[][] connectionCheckpoints = primeCheckpoints.toArray(new int[0][]);
+    for ( int[] loc: connectionCheckpoints ) {
+      int[] anotherLoc = connectionCheckpoints[rnd.nextInt(connectionCheckpoints.length)];
       connect(map, loc, anotherLoc);
+    }
+    int[][] loopChekpoints = checkpoints.toArray(new int[0][]);
+    for ( int i=0; i<loopsCount; i++ ) {
+      // find a start and the end of the loop
+      int[] start = loopChekpoints[rnd.nextInt(loopChekpoints.length)];
+      int[] end   = loopChekpoints[rnd.nextInt(loopChekpoints.length)];
+      connect(map, start, end);
     }
   }
 
