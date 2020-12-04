@@ -6,6 +6,10 @@ Currently implemented PCG algorithms:
 * Binary Space Partitioning
 * Tunnelling
 
+### Run
+
+```java -jar bin\DungeonGenerator.jar```
+
 ### GUI
 
 ![tree0](https://imgur.com/8NvAHqL.png)
